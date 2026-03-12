@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import * as vm from "vm";
 import * as React from "react";
 import * as ReactDOMServer from "react-dom/server";
+import { transformSync } from "esbuild";
 import type { Block, RunBlock, WebviewMessage } from "../types";
 import { parseDocument } from "../parser";
 import {
@@ -184,11 +185,20 @@ export class StereoEditorProvider implements vscode.CustomTextEditorProvider {
 
     const ctx = vm.createContext(sandbox);
 
+    // Transpile JSX/TSX to React.createElement calls
+    const transpiled = transformSync(block.code, {
+      loader: block.lang === "tsx" || block.lang === "jsx" ? "tsx" : "ts",
+      jsx: "transform",
+      jsxFactory: "React.createElement",
+      jsxFragment: "React.Fragment",
+      target: "es2020",
+    });
+
     // Wrap code in async IIFE to support top-level await
     const wrappedCode = `
       "use strict";
       (async function() {
-        ${block.code}
+        ${transpiled.code}
       })();
     `;
 

@@ -15,7 +15,7 @@ const extensionConfig = {
   outfile: "dist/extension.js",
   platform: "node",
   format: "cjs",
-  external: ["vscode"],
+  external: ["vscode", "esbuild"],
 };
 
 // Webview bundle (browser, IIFE, React bundled)
