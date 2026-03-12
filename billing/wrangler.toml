@@ -1,0 +1,18 @@
+name = "stereo-billing"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[observability]
+enabled = true
+head_sampling_rate = 1
+
+[[d1_databases]]
+binding = "DB"
+database_name = "stereo-billing"
+database_id = "a1778a5d-0fc5-41f8-b3a3-3a0b61cc4855"
+
+[vars]
+STRIPE_PRO_PRICE_ID = "price_1TADSjL8AsZfKgkdnKvb3zTs"
+STRIPE_ENTERPRISE_PRICE_ID = "price_1TADSkL8AsZfKgkdxt1aZ2gp"
+ALLOWED_ORIGINS = "https://stereo.leap21llc.com"

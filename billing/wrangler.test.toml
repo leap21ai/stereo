@@ -1,0 +1,16 @@
+name = "stereo-billing-test"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "stereo-billing-test"
+database_id = "test-local"
+
+[vars]
+STRIPE_SECRET_KEY = "sk_test_fake"
+STRIPE_WEBHOOK_SECRET = "whsec_test_fake"
+STRIPE_PRO_PRICE_ID = "price_pro_test"
+STRIPE_ENTERPRISE_PRICE_ID = "price_enterprise_test"
+ALLOWED_ORIGINS = "http://localhost:3000"
