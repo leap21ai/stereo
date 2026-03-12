@@ -576,56 +576,11 @@
   <!-- Demo -->
   <section class="demo">
     <div class="container">
-      <div class="demo-frame">
-        <div class="demo-titlebar">
-          <div class="demo-dot"></div>
-          <div class="demo-dot"></div>
-          <div class="demo-dot"></div>
-          <span>api-health.md — Stereo Preview</span>
-        </div>
-        <div class="demo-body">
-          <!-- Editor side -->
-          <div class="demo-editor">
-            <div class="demo-editor-label">Markdown Source</div>
-            <div class="demo-code">
-              <span class="comment"># API Health Dashboard</span><br><br>
-              <span class="kw">```tsx run</span> <span class="attr">refresh=30s</span><br>
-              <span class="kw">const</span> <span class="attr">res</span> = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">"/api/health"</span>);<br>
-              <span class="kw">const</span> <span class="attr">data</span> = <span class="kw">await</span> <span class="attr">res</span>.<span class="fn">json</span>();<br><br>
-              <span class="kw">return</span> (<br>
-              &nbsp;&nbsp;&lt;<span class="type">MetricCard</span><br>
-              &nbsp;&nbsp;&nbsp;&nbsp;<span class="attr">label</span>=<span class="str">"Uptime"</span><br>
-              &nbsp;&nbsp;&nbsp;&nbsp;<span class="attr">value</span>={<span class="attr">data</span>.<span class="attr">uptime</span>}<br>
-              &nbsp;&nbsp;/&gt;<br>
-              );<br>
-              <span class="kw">```</span>
-            </div>
-          </div>
-          <!-- Preview side -->
-          <div class="demo-preview">
-            <div class="demo-preview-label">Live Output</div>
-            <div class="demo-metric">
-              <div class="demo-metric-label">Uptime</div>
-              <div class="demo-metric-val up">99.97%</div>
-              <div class="demo-sparkline">
-                <div class="demo-sparkline-bar" style="height: 70%"></div>
-                <div class="demo-sparkline-bar" style="height: 85%"></div>
-                <div class="demo-sparkline-bar" style="height: 60%"></div>
-                <div class="demo-sparkline-bar" style="height: 90%"></div>
-                <div class="demo-sparkline-bar" style="height: 95%"></div>
-                <div class="demo-sparkline-bar" style="height: 80%"></div>
-                <div class="demo-sparkline-bar" style="height: 100%"></div>
-                <div class="demo-sparkline-bar" style="height: 88%"></div>
-                <div class="demo-sparkline-bar" style="height: 75%"></div>
-                <div class="demo-sparkline-bar" style="height: 92%"></div>
-              </div>
-            </div>
-            <div class="demo-metric">
-              <div class="demo-metric-label">Response Time</div>
-              <div class="demo-metric-val">142<span style="font-size: 16px; color: var(--text-muted);"> ms</span></div>
-            </div>
-          </div>
-        </div>
+      <div style="max-width: 960px; margin: 0 auto; border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.06); box-shadow: 0 24px 80px rgba(0,0,0,0.5);">
+        <video autoplay loop muted playsinline style="width: 100%; display: block;">
+          <source src="marketing/stereo-demo.webm" type="video/webm">
+          <source src="marketing/stereo-demo.mp4" type="video/mp4">
+        </video>
       </div>
       <p class="demo-caption">Live dashboard output from a standard markdown file</p>
     </div>

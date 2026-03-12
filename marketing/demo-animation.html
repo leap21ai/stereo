@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stereo Demo Animation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0a0a0f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: "Inter", -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+    }
+
+    code, .mono {
+      font-family: "JetBrains Mono", "SF Mono", Monaco, monospace;
+    }
+
+    /* ====== SCENE CONTAINER ====== */
+    .scene {
+      width: 1200px;
+      animation: sceneLoop 12s linear infinite;
+    }
+
+    @keyframes sceneLoop {
+      0%, 100% { opacity: 1; }
+    }
+
+    /* ====== EDITOR WINDOW ====== */
+    .editor-window {
+      background: #1a1a24;
+      border: 1px solid #2a2a3a;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow:
+        0 0 0 1px rgba(77, 143, 204, 0.05),
+        0 20px 60px rgba(0, 0, 0, 0.5),
+        0 0 120px rgba(77, 143, 204, 0.04);
+      opacity: 0;
+      transform: translateY(20px) scale(0.98);
+      animation: windowIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+    }
+
+    @keyframes windowIn {
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* ====== TITLE BAR ====== */
+    .titlebar {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      background: #15151e;
+      border-bottom: 1px solid #2a2a3a;
+    }
+
+    .titlebar-dots {
+      display: flex;
+      gap: 8px;
+    }
+
+    .titlebar-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .titlebar-dot:nth-child(1) { background: #ff5f57; }
+    .titlebar-dot:nth-child(2) { background: #febc2e; }
+    .titlebar-dot:nth-child(3) { background: #28c840; }
+
+    .titlebar-text {
+      flex: 1;
+      text-align: center;
+      font-size: 12px;
+      color: #666;
+      font-family: "Inter", sans-serif;
+    }
+
+    .titlebar-spacer {
+      width: 52px;
+    }
+
+    /* ====== EDITOR BODY ====== */
+    .editor-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 440px;
+    }
+
+    /* ====== LEFT PANEL — CODE EDITOR ====== */
+    .panel-left {
+      padding: 24px 28px;
+      border-right: 1px solid #2a2a3a;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .file-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #ccc;
+      background: #22222e;
+      border: 1px solid #2a2a3a;
+      border-radius: 6px;
+      padding: 5px 12px;
+      margin-bottom: 20px;
+      font-family: "Inter", sans-serif;
+    }
+
+    .file-tab .icon {
+      color: #4d8fcc;
+      font-size: 11px;
+    }
+
+    /* ====== CURSOR ====== */
+    .cursor {
+      display: inline-block;
+      width: 2px;
+      height: 16px;
+      background: #569cd6;
+      vertical-align: text-bottom;
+      animation: blink 1s step-end infinite;
+      opacity: 0;
+    }
+
+    /* Show cursor from 0s to ~5.5s, then hide */
+    .cursor {
+      animation:
+        cursorAppear 0.01s 0.5s forwards,
+        blink 1s step-end infinite,
+        cursorHide 0.01s 5.5s forwards;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    @keyframes cursorAppear {
+      to { opacity: 1; }
+    }
+
+    @keyframes cursorHide {
+      to { opacity: 0; }
+    }
+
+    /* ====== TYPING LINES ====== */
+    .code-area {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 13px;
+      line-height: 1.8;
+      position: relative;
+    }
+
+    .type-line {
+      white-space: nowrap;
+      overflow: hidden;
+      max-width: 0;
+      display: block;
+      height: 0;
+      opacity: 0;
+    }
+
+    /* Line 1: # API Health Dashboard — appears at 1.2s */
+    .line-1 {
+      animation:
+        lineReveal 0.01s 1.2s forwards,
+        typeOut 0.8s steps(24, end) 1.2s forwards;
+      color: #e0e0e0;
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    /* Line 2: blank — appears at 2.1s */
+    .line-2 {
+      animation: lineReveal 0.01s 2.1s forwards;
+      min-height: 23.4px;
+    }
+
+    /* Line 3: ```tsx run — appears at 2.3s */
+    .line-3 {
+      animation:
+        lineReveal 0.01s 2.3s forwards,
+        typeOut 0.5s steps(11, end) 2.3s forwards;
+    }
+
+    /* Line 4: const data = await fetch — 2.9s */
+    .line-4 {
+      animation:
+        lineReveal 0.01s 2.9s forwards,
+        typeOut 0.6s steps(28, end) 2.9s forwards;
+      padding-left: 16px;
+    }
+
+    /* Line 5: const stats = await data.json() — 3.6s */
+    .line-5 {
+      animation:
+        lineReveal 0.01s 3.6s forwards,
+        typeOut 0.6s steps(31, end) 3.6s forwards;
+      padding-left: 16px;
+    }
+
+    /* Line 6: blank — 4.3s */
+    .line-6 {
+      animation: lineReveal 0.01s 4.3s forwards;
+      min-height: 23.4px;
+    }
+
+    /* Line 7: return <Dashboard — 4.4s */
+    .line-7 {
+      animation:
+        lineReveal 0.01s 4.4s forwards,
+        typeOut 0.5s steps(20, end) 4.4s forwards;
+      padding-left: 16px;
+    }
+
+    /* Line 8: ``` — 5.0s */
+    .line-8 {
+      animation:
+        lineReveal 0.01s 5.0s forwards,
+        typeOut 0.2s steps(3, end) 5.0s forwards;
+    }
+
+    @keyframes lineReveal {
+      to {
+        height: auto;
+        opacity: 1;
+      }
+    }
+
+    @keyframes typeOut {
+      to {
+        max-width: 600px;
+      }
+    }
+
+    /* ====== SYNTAX COLORS ====== */
+    .kw { color: #569cd6; }
+    .str { color: #7ec699; }
+    .fn { color: #dcdcaa; }
+    .type { color: #4ec9b0; }
+    .comment { color: #6a6a7a; }
+    .tag { color: #569cd6; }
+    .attr { color: #9cdcfe; }
+    .punct { color: #808090; }
+    .heading-hash { color: #569cd6; font-weight: 600; }
+    .fence { color: #7c5cbf; }
+    .lang { color: #4ec9b0; }
+    .run-kw { color: #4d8fcc; font-weight: 500; }
+
+    /* ====== RUN BADGE ====== */
+    .run-badge-container {
+      position: absolute;
+      right: 28px;
+      opacity: 0;
+      transform: translateX(10px);
+      animation: badgeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 5.3s forwards;
+    }
+
+    /* Position near the code block header */
+    .run-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: "Inter", sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #22c55e;
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.25);
+      border-radius: 6px;
+      padding: 4px 10px;
+      animation: badgePulse 2s ease-in-out 5.8s infinite;
+    }
+
+    .run-badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #22c55e;
+    }
+
+    @keyframes badgeIn {
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes badgePulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+      50% { box-shadow: 0 0 12px 2px rgba(34, 197, 94, 0.15); }
+    }
+
+    /* ====== CODE BLOCK BORDER GLOW ====== */
+    .code-block-wrapper {
+      position: relative;
+      margin-top: 4px;
+    }
+
+    .code-block-wrapper::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -8px;
+      width: 3px;
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(180deg, #4d8fcc, #7c5cbf);
+      opacity: 0;
+      animation: glowBarIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 5.3s forwards;
+    }
+
+    @keyframes glowBarIn {
+      to { opacity: 1; }
+    }
+
+    /* ====== RIGHT PANEL — PREVIEW ====== */
+    .panel-right {
+      padding: 24px 28px;
+      opacity: 0;
+      transform: translateX(10px);
+      animation: panelRightIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) 6.0s forwards;
+      overflow: hidden;
+    }
+
+    @keyframes panelRightIn {
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .preview-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .preview-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #666;
+      font-family: "Inter", sans-serif;
+    }
+
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: "Inter", sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #22c55e;
+      background: rgba(34, 197, 94, 0.08);
+      border: 1px solid rgba(34, 197, 94, 0.2);
+      border-radius: 100px;
+      padding: 3px 10px;
+      opacity: 0;
+      animation: liveBadgeIn 0.4s ease 6.5s forwards, livePulse 3s ease-in-out 7s infinite;
+    }
+
+    .live-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #22c55e;
+      animation: liveDotPulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes liveBadgeIn {
+      to { opacity: 1; }
+    }
+
+    @keyframes livePulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    @keyframes liveDotPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    /* ====== METRIC CARDS ====== */
+    .metrics-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .metric-card {
+      background: #13131c;
+      border: 1px solid #2a2a3a;
+      border-radius: 8px;
+      padding: 14px;
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    .metric-card:nth-child(1) {
+      animation: cardIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 6.5s forwards;
+    }
+    .metric-card:nth-child(2) {
+      animation: cardIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 6.7s forwards;
+    }
+    .metric-card:nth-child(3) {
+      animation: cardIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 6.9s forwards;
+    }
+
+    @keyframes cardIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .metric-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #666;
+      margin-bottom: 4px;
+      font-family: "Inter", sans-serif;
+    }
+
+    .metric-value {
+      font-size: 22px;
+      font-weight: 300;
+      color: #fff;
+      font-variant-numeric: tabular-nums;
+      font-family: "Inter", sans-serif;
+    }
+
+    .metric-delta {
+      font-size: 10px;
+      font-weight: 500;
+      margin-top: 3px;
+      font-family: "Inter", sans-serif;
+    }
+
+    .delta-up { color: #22c55e; }
+    .delta-down { color: #ef4444; }
+
+    /* ====== METRIC VALUE LIVE UPDATE (42ms → 38ms) ====== */
+    .metric-value-animated {
+      position: relative;
+      display: inline-block;
+    }
+
+    .val-initial {
+      animation: valFadeOut 0.4s ease 10.0s forwards;
+    }
+
+    .val-updated {
+      position: absolute;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      animation: valFadeIn 0.4s ease 10.0s forwards;
+    }
+
+    @keyframes valFadeOut {
+      to { opacity: 0; }
+    }
+
+    @keyframes valFadeIn {
+      to { opacity: 1; }
+    }
+
+    /* Delta change */
+    .delta-animated .delta-initial {
+      animation: valFadeOut 0.3s ease 10.2s forwards;
+    }
+    .delta-animated .delta-updated {
+      position: absolute;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      animation: valFadeIn 0.3s ease 10.2s forwards;
+    }
+
+    /* ====== SPARKLINE CHART ====== */
+    .sparkline-container {
+      background: #13131c;
+      border: 1px solid #2a2a3a;
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 16px;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: cardIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 7.2s forwards;
+    }
+
+    .sparkline-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .sparkline-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #666;
+      font-family: "Inter", sans-serif;
+    }
+
+    .sparkline-period {
+      font-size: 10px;
+      color: #555;
+      font-family: "Inter", sans-serif;
+    }
+
+    .sparkline-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 48px;
+    }
+
+    .spark-bar {
+      flex: 1;
+      border-radius: 2px 2px 0 0;
+      background: #4d8fcc;
+      transform-origin: bottom;
+      transform: scaleY(0);
+    }
+
+    /* Staggered bar growth */
+    .spark-bar:nth-child(1)  { height: 60%; animation: barGrow 0.5s cubic-bezier(0.16, 1, 0.3, 1) 7.5s forwards; }
+    .spark-bar:nth-child(2)  { height: 75%; animation: barGrow 0.5s cubic-bezier(0.16, 1, 0.3, 1) 7.55s forwards; }
+    .spark-bar:nth-child(3)  { height: 45%; animation: barGrow 0.5s cubic-bezier(0.16, 1, 0.3, 1) 7.6s forwards; }
+    .spark-bar:nth-child(4)  { height: 85%; animation: barGrow 0.5s cubic-bezier(0.16, 1, 0.3, 1) 7.65s forwards; }
+    .spark-bar:nth-child(5)  { height: 55%; animation: barGrow 0.5s cubic-bezier(0.16, 1, 0.3, 1) 7.7s forwards; }
+    .spark-bar:nth-child(6)  { height: 90%; animation: barGrow 0.5s cubic-bezier(0.16, 1, 0.3, 1) 7.75s forwards; }
+    .spark-bar:nth-child(7)  { height: 70%; animation: barGrow 0.5s cubic-bezier(0.16, 1, 0.3, 1) 7.8s forwards; }
+    .spark-bar:nth-child(8)  { height: 65%; animation: barGrow 0.5s cubic-bezier(0.16, 1, 0.3, 1) 7.85s forwards; }
+    .spark-bar:nth-child(9)  { height: 80%; animation: barGrow 0.5s cubic-bezier(0.16, 1, 0.3, 1) 7.9s forwards; }
+    .spark-bar:nth-child(10) { height: 50%; animation: barGrow 0.5s cubic-bezier(0.16, 1, 0.3, 1) 7.95s forwards; }
+    .spark-bar:nth-child(11) { height: 95%; animation: barGrow 0.5s cubic-bezier(0.16, 1, 0.3, 1) 8.0s forwards; }
+    .spark-bar:nth-child(12) { height: 72%; animation: barGrow 0.5s cubic-bezier(0.16, 1, 0.3, 1) 8.05s forwards; }
+
+    /* Bar shift at 10.3s — simulate live data update */
+    .spark-bar:nth-child(1)  { animation: barGrow 0.5s cubic-bezier(0.16, 1, 0.3, 1) 7.5s forwards, barShift1 0.4s ease 10.3s forwards; }
+    .spark-bar:nth-child(2)  { animation: barGrow 0.5s cubic-bezier(0.16, 1, 0.3, 1) 7.55s forwards, barShift2 0.4s ease 10.3s forwards; }
+    .spark-bar:nth-child(11) { animation: barGrow 0.5s cubic-bezier(0.16, 1, 0.3, 1) 8.0s forwards, barShift11 0.4s ease 10.3s forwards; }
+    .spark-bar:nth-child(12) { animation: barGrow 0.5s cubic-bezier(0.16, 1, 0.3, 1) 8.05s forwards, barShift12 0.4s ease 10.3s forwards; }
+
+    @keyframes barGrow {
+      to { transform: scaleY(1); }
+    }
+
+    @keyframes barShift1 {
+      to { height: 55%; }
+    }
+    @keyframes barShift2 {
+      to { height: 82%; }
+    }
+    @keyframes barShift11 {
+      to { height: 100%; }
+    }
+    @keyframes barShift12 {
+      to { height: 85%; }
+    }
+
+    /* ====== STATUS TABLE ====== */
+    .status-table {
+      background: #13131c;
+      border: 1px solid #2a2a3a;
+      border-radius: 8px;
+      padding: 14px;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: cardIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 8.3s forwards;
+    }
+
+    .status-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #666;
+      margin-bottom: 10px;
+      font-family: "Inter", sans-serif;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px solid #1f1f2e;
+    }
+
+    .status-row:last-child {
+      border-bottom: none;
+    }
+
+    .status-row-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+    }
+
+    .status-dot.green { background: #22c55e; box-shadow: 0 0 6px rgba(34, 197, 94, 0.4); }
+    .status-dot.red { background: #ef4444; box-shadow: 0 0 6px rgba(239, 68, 68, 0.4); }
+
+    .status-name {
+      font-size: 12px;
+      color: #ccc;
+      font-family: "Inter", sans-serif;
+    }
+
+    .status-ms {
+      font-size: 11px;
+      color: #666;
+      font-family: "JetBrains Mono", monospace;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ====== LINE NUMBERS ====== */
+    .line-numbers {
+      position: absolute;
+      top: 0;
+      left: -28px;
+      width: 20px;
+      text-align: right;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 12px;
+      line-height: 1.8;
+      color: #3a3a4a;
+      user-select: none;
+    }
+
+    .ln {
+      display: block;
+      height: 0;
+      overflow: hidden;
+      opacity: 0;
+    }
+
+    .ln-1 { animation: lineReveal 0.01s 1.2s forwards; }
+    .ln-2 { animation: lineReveal 0.01s 2.1s forwards; }
+    .ln-3 { animation: lineReveal 0.01s 2.3s forwards; }
+    .ln-4 { animation: lineReveal 0.01s 2.9s forwards; }
+    .ln-5 { animation: lineReveal 0.01s 3.6s forwards; }
+    .ln-6 { animation: lineReveal 0.01s 4.3s forwards; }
+    .ln-7 { animation: lineReveal 0.01s 4.4s forwards; }
+    .ln-8 { animation: lineReveal 0.01s 5.0s forwards; }
+
+    .code-content {
+      position: relative;
+      padding-left: 32px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="scene">
+  <div class="editor-window">
+    <!-- Title Bar -->
+    <div class="titlebar">
+      <div class="titlebar-dots">
+        <div class="titlebar-dot"></div>
+        <div class="titlebar-dot"></div>
+        <div class="titlebar-dot"></div>
+      </div>
+      <div class="titlebar-text">dashboard.md — Stereo</div>
+      <div class="titlebar-spacer"></div>
+    </div>
+
+    <!-- Editor Body -->
+    <div class="editor-body">
+      <!-- LEFT PANEL — Editor -->
+      <div class="panel-left">
+        <div class="file-tab">
+          <span class="icon">M&#8595;</span>
+          dashboard.md
+        </div>
+
+        <div class="code-area">
+          <div class="code-content">
+            <!-- Line Numbers -->
+            <div class="line-numbers">
+              <span class="ln ln-1">1</span>
+              <span class="ln ln-2">2</span>
+              <span class="ln ln-3">3</span>
+              <span class="ln ln-4">4</span>
+              <span class="ln ln-5">5</span>
+              <span class="ln ln-6">6</span>
+              <span class="ln ln-7">7</span>
+              <span class="ln ln-8">8</span>
+            </div>
+
+            <!-- Typed Lines -->
+            <span class="type-line line-1"><span class="heading-hash">#</span> API Health Dashboard</span>
+            <span class="type-line line-2">&nbsp;</span>
+            <span class="type-line line-3"><span class="fence">```</span><span class="lang">tsx</span> <span class="run-kw">run</span></span>
+
+            <div class="code-block-wrapper">
+              <span class="type-line line-4"><span class="kw">const</span> <span class="attr">data</span> <span class="punct">=</span> <span class="kw">await</span> <span class="fn">fetch</span><span class="punct">(</span><span class="str">"/api/health"</span><span class="punct">)</span></span>
+              <span class="type-line line-5"><span class="kw">const</span> <span class="attr">stats</span> <span class="punct">=</span> <span class="kw">await</span> <span class="attr">data</span><span class="punct">.</span><span class="fn">json</span><span class="punct">()</span></span>
+              <span class="type-line line-6">&nbsp;</span>
+              <span class="type-line line-7"><span class="kw">return</span> <span class="punct">&lt;</span><span class="type">Dashboard</span> <span class="attr">data</span><span class="punct">={</span><span class="attr">stats</span><span class="punct">}</span> <span class="punct">/&gt;</span></span>
+            </div>
+
+            <span class="type-line line-8"><span class="fence">```</span></span>
+
+            <!-- Blinking Cursor -->
+            <span class="cursor"></span>
+          </div>
+        </div>
+
+        <!-- Run Badge -->
+        <div class="run-badge-container" style="top: 118px;">
+          <div class="run-badge">
+            <div class="run-badge-dot"></div>
+            Running
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT PANEL — Preview -->
+      <div class="panel-right">
+        <div class="preview-header">
+          <span class="preview-label">Live Preview</span>
+          <div class="live-badge">
+            <div class="live-dot"></div>
+            Live
+          </div>
+        </div>
+
+        <!-- Metric Cards -->
+        <div class="metrics-row">
+          <div class="metric-card">
+            <div class="metric-label">Uptime</div>
+            <div class="metric-value">99.97%</div>
+            <div class="metric-delta delta-up">+0.02%</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Response Time</div>
+            <div class="metric-value">
+              <span class="metric-value-animated">
+                <span class="val-initial">42ms</span>
+                <span class="val-updated">38ms</span>
+              </span>
+            </div>
+            <div class="metric-delta delta-animated" style="position: relative;">
+              <span class="delta-initial delta-down">+3ms</span>
+              <span class="delta-updated delta-up">-4ms</span>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Requests</div>
+            <div class="metric-value">12.4k</div>
+            <div class="metric-delta delta-up">+18%</div>
+          </div>
+        </div>
+
+        <!-- Sparkline Chart -->
+        <div class="sparkline-container">
+          <div class="sparkline-header">
+            <span class="sparkline-title">Requests / min</span>
+            <span class="sparkline-period">Last 12m</span>
+          </div>
+          <div class="sparkline-bars">
+            <div class="spark-bar"></div>
+            <div class="spark-bar"></div>
+            <div class="spark-bar"></div>
+            <div class="spark-bar"></div>
+            <div class="spark-bar"></div>
+            <div class="spark-bar"></div>
+            <div class="spark-bar"></div>
+            <div class="spark-bar"></div>
+            <div class="spark-bar"></div>
+            <div class="spark-bar"></div>
+            <div class="spark-bar"></div>
+            <div class="spark-bar"></div>
+          </div>
+        </div>
+
+        <!-- Status Table -->
+        <div class="status-table">
+          <div class="status-title">Endpoints</div>
+          <div class="status-row">
+            <div class="status-row-left">
+              <div class="status-dot green"></div>
+              <span class="status-name">/api/users</span>
+            </div>
+            <span class="status-ms">12ms</span>
+          </div>
+          <div class="status-row">
+            <div class="status-row-left">
+              <div class="status-dot green"></div>
+              <span class="status-name">/api/orders</span>
+            </div>
+            <span class="status-ms">28ms</span>
+          </div>
+          <div class="status-row">
+            <div class="status-row-left">
+              <div class="status-dot red"></div>
+              <span class="status-name">/api/payments</span>
+            </div>
+            <span class="status-ms">340ms</span>
+          </div>
+          <div class="status-row">
+            <div class="status-row-left">
+              <div class="status-dot green"></div>
+              <span class="status-name">/api/analytics</span>
+            </div>
+            <span class="status-ms">45ms</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
