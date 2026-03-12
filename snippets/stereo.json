@@ -1,0 +1,96 @@
+{
+  "Stereo: Basic Run Block": {
+    "prefix": "stereo",
+    "body": [
+      "```tsx run",
+      "$0",
+      "```"
+    ],
+    "description": "Stereo executable code block"
+  },
+  "Stereo: MetricCard": {
+    "prefix": "stereo-metric",
+    "body": [
+      "```tsx run",
+      "const res = await fetch(\"$1\");",
+      "const data = await res.json();",
+      "",
+      "return (",
+      "  <MetricCard",
+      "    label=\"${2:Label}\"",
+      "    value={${3:data.value}}",
+      "    status=\"${4|success,danger,caution,neutral|}\"",
+      "  />",
+      ");",
+      "```"
+    ],
+    "description": "Stereo MetricCard with fetch"
+  },
+  "Stereo: Dashboard": {
+    "prefix": "stereo-dashboard",
+    "body": [
+      "```tsx run refresh=${1:30s}",
+      "const res = await fetch(\"$2\");",
+      "const data = await res.json();",
+      "",
+      "return (",
+      "  <DashGrid cols={${3:2}}>",
+      "    <MetricCard label=\"${4:Metric 1}\" value={${5:data.value1}} status=\"success\" />",
+      "    <MetricCard label=\"${6:Metric 2}\" value={${7:data.value2}} status=\"neutral\" />",
+      "  </DashGrid>",
+      ");",
+      "```"
+    ],
+    "description": "Stereo full dashboard grid"
+  },
+  "Stereo: StatusTable": {
+    "prefix": "stereo-status",
+    "body": [
+      "```tsx run refresh=${1:10s}",
+      "const endpoints = [",
+      "  { name: \"${2:API}\", url: \"${3:https://example.com/health}\" },",
+      "];",
+      "",
+      "const results = await Promise.all(",
+      "  endpoints.map(async (ep) => {",
+      "    try {",
+      "      const start = Date.now();",
+      "      const res = await fetch(ep.url, { method: \"HEAD\" });",
+      "      return { name: ep.name, ok: res.ok, ms: Date.now() - start };",
+      "    } catch {",
+      "      return { name: ep.name, ok: false, ms: 0 };",
+      "    }",
+      "  })",
+      ");",
+      "",
+      "return (",
+      "  <StatusTable",
+      "    headers={[\"Endpoint\", \"Status\", \"Latency\"]}",
+      "    rows={results.map((r) => ({",
+      "      cells: [r.name, r.ok ? \"Online\" : \"Offline\", r.ms + \"ms\"],",
+      "      status: r.ok ? \"success\" : \"danger\",",
+      "    }))}",
+      "  />",
+      ");",
+      "```"
+    ],
+    "description": "Stereo endpoint status table"
+  },
+  "Stereo: Sparkline": {
+    "prefix": "stereo-sparkline",
+    "body": [
+      "```tsx run refresh=${1:30s}",
+      "const res = await fetch(\"$2\");",
+      "const data = await res.json();",
+      "",
+      "return (",
+      "  <Sparkline",
+      "    data={${3:data.values}}",
+      "    thresholds={{ ok: ${4:80}, warn: ${5:60} }}",
+      "  />",
+      ");",
+      "```"
+    ],
+    "description": "Stereo sparkline chart"
+  }
+}

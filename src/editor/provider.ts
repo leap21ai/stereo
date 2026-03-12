@@ -140,12 +140,11 @@ export class StereoEditorProvider implements vscode.CustomTextEditorProvider {
       sendExecutionResult(webview, blockIndex, html, duration);
     } catch (err: unknown) {
       const duration = performance.now() - start;
-      const error = err instanceof Error ? err : new Error(String(err));
       sendExecutionError(
         webview,
         blockIndex,
-        error.message,
-        error.stack
+        cleanErrorMessage(err),
+        err instanceof Error ? err.stack : String(err)
       );
     }
   }
@@ -249,6 +248,36 @@ export class StereoEditorProvider implements vscode.CustomTextEditorProvider {
 </body>
 </html>`;
   }
+}
+
+/**
+ * Extract a clean, user-friendly error message from an error.
+ * Removes stack trace lines, cleans up filenames, and adds hints
+ * for common errors.
+ */
+function cleanErrorMessage(err: unknown): string {
+  const raw = err instanceof Error ? err.message : String(err);
+
+  // Strip "block-N.tsx:N:" filename prefixes from the message
+  let message = raw.replace(/^block-\d+\.\w+:\d+:\s*/, "");
+
+  // Take only the first line (before stack trace "at ..." lines)
+  const firstLine = message.split("\n").find((line) => !line.trim().startsWith("at "));
+  if (firstLine) {
+    message = firstLine.trim();
+  }
+
+  // Add hints for common errors
+  if (/await is only valid/.test(message)) {
+    message += "\n\nHint: Use ```tsx run (not ```tsx) to enable async/await";
+  } else if (/is not defined/.test(message)) {
+    message +=
+      "\n\nHint: Did you mean to import this? Built-in components: MetricCard, DashGrid, Sparkline, StatusTable";
+  } else if (/fetch failed|NetworkError|ECONNREFUSED|ENOTFOUND/i.test(message)) {
+    message += "\n\nHint: Network request failed. Check the URL and try again.";
+  }
+
+  return message;
 }
 
 function getNonce(): string {

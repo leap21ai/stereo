@@ -26,6 +26,7 @@ const RunBlockComponent: React.FC<RunBlockProps> = ({
   onToggleSource,
   onRun,
 }) => {
+  const [showErrorDetails, setShowErrorDetails] = useState(false);
   const title = block.options.title || `${block.lang} block`;
   const refreshLabel = block.options.refresh
     ? ` \u00b7 auto-refresh ${block.options.refresh / 1000}s`
@@ -91,7 +92,17 @@ const RunBlockComponent: React.FC<RunBlockProps> = ({
           <div className="run-error-title">Execution Error</div>
           <div className="run-error-message">{error}</div>
           {errorStack && (
-            <div className="run-error-stack">{errorStack}</div>
+            <>
+              <button
+                className="run-error-details-toggle"
+                onClick={() => setShowErrorDetails((prev) => !prev)}
+              >
+                {showErrorDetails ? "\u25BC Hide Details" : "\u25B6 Show Details"}
+              </button>
+              {showErrorDetails && (
+                <div className="run-error-stack">{errorStack}</div>
+              )}
+            </>
           )}
         </div>
       )}
