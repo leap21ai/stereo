@@ -1,0 +1,346 @@
+/* Stereo — Component Styles
+ * Run blocks, dashboard widgets, sparklines, status tables
+ * Adapted from wireframe.html
+ */
+
+/* ── Run Block ── */
+.run-block {
+  border: 1px solid var(--stereo-run-border);
+  border-radius: 8px;
+  margin: 20px 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.run-block::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 8px;
+  padding: 1px;
+  background: linear-gradient(135deg, oklch(0.50 0.15 250), oklch(0.40 0.10 280));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.run-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--stereo-run-bg);
+  border-bottom: 1px solid var(--stereo-run-border);
+}
+
+.run-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+}
+
+.run-badge {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  background: oklch(0.35 0.10 250);
+  color: oklch(0.80 0.12 250);
+}
+
+.run-lang {
+  color: var(--vsc-text-muted);
+}
+
+.run-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.run-action-btn {
+  padding: 3px 10px;
+  font-size: 10px;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: opacity 0.15s;
+}
+
+.run-action-btn:hover {
+  opacity: 0.85;
+}
+
+.run-action-btn.source {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--vsc-text-muted);
+}
+
+.run-action-btn.source.active {
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--vsc-text);
+}
+
+.run-action-btn.run {
+  background: oklch(0.35 0.10 250);
+  color: oklch(0.85 0.10 250);
+}
+
+.run-action-btn.run:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.run-action-btn.run.running {
+  background: oklch(0.30 0.06 250);
+}
+
+/* ── Source View (inside run block) ── */
+.run-source {
+  padding: 16px;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-mono);
+  line-height: 1.6;
+  background: var(--stereo-run-bg);
+  overflow-x: auto;
+  white-space: pre;
+  color: var(--vsc-text);
+}
+
+/* ── Live Output ── */
+.live-output {
+  background: var(--live-bg);
+  padding: 20px;
+}
+
+.live-output:empty {
+  display: none;
+}
+
+/* ── Loading State ── */
+.run-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 20px;
+  background: var(--live-bg);
+  color: var(--vsc-text-muted);
+  font-size: 12px;
+  font-family: var(--font-mono);
+}
+
+.run-loading-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--stereo-run-border);
+  border-top-color: var(--stereo-glow);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Error Display ── */
+.run-error {
+  background: oklch(0.18 0.04 40);
+  border-top: 1px solid oklch(0.35 0.10 40);
+  padding: 16px 20px;
+}
+
+.run-error-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--stereo-danger);
+  margin-bottom: 8px;
+}
+
+.run-error-message {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  color: oklch(0.80 0.08 40);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.run-error-stack {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--vsc-text-muted);
+  margin-top: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  opacity: 0.7;
+}
+
+/* ── Duration Badge ── */
+.run-duration {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--vsc-text-muted);
+  font-variant-numeric: tabular-nums;
+  margin-left: 8px;
+}
+
+/* ── Dashboard Grid ── */
+.dash-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+/* ── Dashboard Card ── */
+.dash-card {
+  background: var(--live-card);
+  border: 1px solid var(--live-border);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.dash-card-label {
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.dash-card-value {
+  font-size: 24px;
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+}
+
+.dash-card-value.success {
+  color: oklch(0.78 0.15 160);
+}
+
+.dash-card-value.danger {
+  color: oklch(0.75 0.14 40);
+}
+
+.dash-card-value.caution {
+  color: oklch(0.82 0.14 85);
+}
+
+.dash-card-sub {
+  font-size: 11px;
+  color: #555;
+  margin-top: 4px;
+}
+
+/* ── Sparkline ── */
+.sparkline-row {
+  background: var(--live-card);
+  border: 1px solid var(--live-border);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.sparkline-label {
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #666;
+  margin-bottom: 12px;
+}
+
+.sparkline-bars {
+  display: flex;
+  gap: 3px;
+  align-items: flex-end;
+  height: 48px;
+}
+
+.sparkline-bar {
+  flex: 1;
+  border-radius: 2px 2px 0 0;
+  min-width: 4px;
+  transition: height 0.3s ease;
+}
+
+.sparkline-bar.ok {
+  background: oklch(0.55 0.12 160);
+}
+
+.sparkline-bar.warn {
+  background: oklch(0.65 0.14 85);
+}
+
+.sparkline-bar.err {
+  background: oklch(0.60 0.14 40);
+}
+
+/* ── Status Table ── */
+.status-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+}
+
+.status-table th {
+  text-align: left;
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #555;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--live-border);
+}
+
+.status-table td {
+  font-size: 12px;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  color: var(--vsc-text);
+  font-family: var(--font-mono);
+}
+
+.status-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.status-dot.ok {
+  background: oklch(0.70 0.18 160);
+}
+
+.status-dot.warn {
+  background: oklch(0.75 0.18 85);
+}
+
+.status-dot.err {
+  background: oklch(0.65 0.18 40);
+}
+
+/* ── Pulse Animation (LIVE badge) ── */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.run-badge.live {
+  animation: pulse 2s ease-in-out infinite;
+}

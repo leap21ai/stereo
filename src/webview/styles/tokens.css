@@ -1,0 +1,48 @@
+/* Stereo — Design Tokens
+ * Extracted from wireframe.html
+ * OKLCH color system with VS Code theme integration
+ */
+
+:root {
+  /* VS Code dark theme tokens (fallbacks when --vscode-* vars unavailable) */
+  --vsc-bg: var(--vscode-editor-background, #1e1e1e);
+  --vsc-sidebar: var(--vscode-sideBar-background, #252526);
+  --vsc-border: var(--vscode-panel-border, #3c3c3c);
+  --vsc-text: var(--vscode-editor-foreground, #d4d4d4);
+  --vsc-text-muted: var(--vscode-descriptionForeground, #858585);
+  --vsc-text-bright: var(--vscode-foreground, #ffffff);
+  --vsc-accent: var(--vscode-focusBorder, #007acc);
+  --vsc-scrollbar: var(--vscode-scrollbarSlider-background, #424242);
+  --vsc-selection: var(--vscode-editor-selectionBackground, #264f78);
+
+  /* Syntax colors */
+  --syn-keyword: #569cd6;
+  --syn-string: #ce9178;
+  --syn-comment: #6a9955;
+  --syn-function: #dcdcaa;
+  --syn-type: #4ec9b0;
+  --syn-variable: #9cdcfe;
+  --syn-number: #b5cea8;
+  --syn-tag: #569cd6;
+  --syn-attr: #9cdcfe;
+  --syn-punctuation: #d4d4d4;
+  --syn-operator: #d4d4d4;
+
+  /* Stereo-specific OKLCH tokens */
+  --stereo-glow: oklch(0.72 0.15 250);
+  --stereo-run-bg: oklch(0.22 0.02 250);
+  --stereo-run-border: oklch(0.45 0.12 250);
+  --stereo-success: oklch(0.70 0.15 160);
+  --stereo-danger: oklch(0.70 0.12 40);
+  --stereo-caution: oklch(0.80 0.12 85);
+
+  /* Live output panel */
+  --live-bg: #1a1d23;
+  --live-card: #22262e;
+  --live-border: #2d3240;
+
+  /* Font stacks */
+  --font-sans: var(--vscode-font-family, "Inter", -apple-system, sans-serif);
+  --font-mono: var(--vscode-editor-font-family, "JetBrains Mono", monospace);
+  --font-size-mono: var(--vscode-editor-font-size, 12.5px);
+}

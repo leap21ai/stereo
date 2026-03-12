@@ -1,0 +1,72 @@
+{
+  "name": "stereo",
+  "displayName": "Stereo",
+  "description": "Executable markdown for VS Code",
+  "version": "0.1.0",
+  "publisher": "leap21",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onCommand:stereo.openPreview"
+  ],
+  "contributes": {
+    "customEditors": [
+      {
+        "viewType": "stereo.markdownPreview",
+        "displayName": "Stereo Preview",
+        "selector": [
+          {
+            "filenamePattern": "*.md"
+          }
+        ],
+        "priority": "option"
+      }
+    ],
+    "commands": [
+      {
+        "command": "stereo.openPreview",
+        "title": "Stereo: Open Preview"
+      },
+      {
+        "command": "stereo.runBlock",
+        "title": "Stereo: Run Block"
+      },
+      {
+        "command": "stereo.runAll",
+        "title": "Stereo: Run All Blocks"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "stereo.openPreview",
+        "key": "ctrl+shift+m",
+        "mac": "ctrl+shift+m"
+      }
+    ]
+  },
+  "scripts": {
+    "build": "node esbuild.mjs",
+    "watch": "node esbuild.mjs --watch",
+    "package": "vsce package",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "@types/markdown-it": "^14.1.0",
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.85.0",
+    "esbuild": "^0.24.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0",
+    "vsce": "^2.15.0"
+  },
+  "dependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "markdown-it": "^14.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}

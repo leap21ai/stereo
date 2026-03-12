@@ -1,0 +1,7 @@
+src/
+sidecar/src/
+*.ts
+!dist/**/*.js
+node_modules/
+.git/
+wireframe.html
