@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stereo — VS Code Extension Wireframe</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      /* VS Code dark theme tokens */
+      --vsc-bg: #1e1e1e;
+      --vsc-sidebar: #252526;
+      --vsc-activitybar: #333333;
+      --vsc-tab-active: #1e1e1e;
+      --vsc-tab-inactive: #2d2d2d;
+      --vsc-tab-border: #1e1e1e;
+      --vsc-border: #3c3c3c;
+      --vsc-text: #d4d4d4;
+      --vsc-text-muted: #858585;
+      --vsc-text-bright: #ffffff;
+      --vsc-accent: #007acc;
+      --vsc-minimap: #2d2d2d;
+      --vsc-scrollbar: #424242;
+      --vsc-line-number: #5a5a5a;
+      --vsc-line-highlight: #282828;
+      --vsc-selection: #264f78;
+      --vsc-statusbar: #007acc;
+      --vsc-terminal: #1e1e1e;
+
+      /* Syntax colors */
+      --syn-keyword: #569cd6;
+      --syn-string: #ce9178;
+      --syn-comment: #6a9955;
+      --syn-function: #dcdcaa;
+      --syn-type: #4ec9b0;
+      --syn-variable: #9cdcfe;
+      --syn-number: #b5cea8;
+      --syn-tag: #569cd6;
+      --syn-attr: #9cdcfe;
+      --syn-punctuation: #d4d4d4;
+      --syn-operator: #d4d4d4;
+
+      /* Stereo-specific */
+      --stereo-glow: oklch(0.72 0.15 250);
+      --stereo-run-bg: oklch(0.22 0.02 250);
+      --stereo-run-border: oklch(0.45 0.12 250);
+      --stereo-success: oklch(0.70 0.15 160);
+      --stereo-danger: oklch(0.70 0.12 40);
+      --stereo-caution: oklch(0.80 0.12 85);
+
+      /* Live output panel */
+      --live-bg: #1a1d23;
+      --live-card: #22262e;
+      --live-border: #2d3240;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: #111;
+      color: var(--vsc-text);
+      overflow-x: hidden;
+    }
+
+    /* ── Page Header ── */
+    .page-header {
+      text-align: center;
+      padding: 60px 24px 40px;
+      background: #111;
+    }
+    .page-header h1 {
+      font-size: 32px;
+      font-weight: 300;
+      letter-spacing: -0.5px;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .page-header h1 span {
+      font-weight: 600;
+    }
+    .page-header p {
+      font-size: 13px;
+      color: #888;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── View Switcher ── */
+    .view-switcher {
+      display: flex;
+      justify-content: center;
+      gap: 2px;
+      padding: 0 24px 40px;
+      background: #111;
+    }
+    .view-btn {
+      padding: 8px 20px;
+      font-size: 11px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      border: 1px solid #333;
+      background: transparent;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .view-btn:first-child { border-radius: 6px 0 0 6px; }
+    .view-btn:last-child { border-radius: 0 6px 6px 0; }
+    .view-btn.active {
+      background: #fff;
+      color: #111;
+      border-color: #fff;
+    }
+    .view-btn:hover:not(.active) {
+      border-color: #555;
+      color: #aaa;
+    }
+
+    /* ── VS Code Chrome ── */
+    .vscode-frame {
+      max-width: 1200px;
+      margin: 0 auto 60px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #333;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+    }
+
+    /* Title bar */
+    .titlebar {
+      background: var(--vsc-sidebar);
+      height: 38px;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--vsc-border);
+    }
+    .traffic-lights {
+      display: flex;
+      gap: 8px;
+    }
+    .traffic-light {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    .tl-close { background: #ff5f57; }
+    .tl-min { background: #febc2e; }
+    .tl-max { background: #28c840; }
+    .titlebar-text {
+      flex: 1;
+      text-align: center;
+      font-size: 12px;
+      color: var(--vsc-text-muted);
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Tab bar */
+    .tabbar {
+      background: var(--vsc-tab-inactive);
+      display: flex;
+      height: 36px;
+      border-bottom: 1px solid var(--vsc-border);
+    }
+    .tab {
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-family: 'Inter', sans-serif;
+      color: var(--vsc-text-muted);
+      border-right: 1px solid var(--vsc-border);
+      cursor: pointer;
+      position: relative;
+    }
+    .tab.active {
+      background: var(--vsc-tab-active);
+      color: var(--vsc-text);
+    }
+    .tab.active::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: var(--vsc-accent);
+    }
+    .tab-icon {
+      font-size: 14px;
+      opacity: 0.7;
+    }
+    .tab-close {
+      font-size: 14px;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .tab:hover .tab-close { opacity: 0.5; }
+
+    /* Main layout */
+    .vscode-body {
+      display: flex;
+      height: 600px;
+      background: var(--vsc-bg);
+    }
+
+    /* Activity bar */
+    .activitybar {
+      width: 48px;
+      background: var(--vsc-activitybar);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 8px;
+      gap: 4px;
+      border-right: 1px solid var(--vsc-border);
+      flex-shrink: 0;
+    }
+    .activity-icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: var(--vsc-text-muted);
+      border-radius: 4px;
+      cursor: pointer;
+      position: relative;
+    }
+    .activity-icon:hover { color: var(--vsc-text); }
+    .activity-icon.active {
+      color: var(--vsc-text-bright);
+    }
+    .activity-icon.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 8px;
+      bottom: 8px;
+      width: 2px;
+      background: var(--vsc-text-bright);
+      border-radius: 1px;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 220px;
+      background: var(--vsc-sidebar);
+      border-right: 1px solid var(--vsc-border);
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+    .sidebar-header {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--vsc-text-muted);
+      padding: 12px 16px 8px;
+    }
+    .file-tree {
+      padding: 0 8px;
+    }
+    .file-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 8px;
+      font-size: 12px;
+      font-family: 'Inter', sans-serif;
+      color: var(--vsc-text);
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .file-item:hover { background: rgba(255,255,255,0.05); }
+    .file-item.active { background: rgba(255,255,255,0.08); }
+    .file-item .icon { font-size: 14px; opacity: 0.6; }
+    .file-item.folder { color: var(--vsc-text-muted); }
+    .file-item.indent-1 { padding-left: 24px; }
+    .file-item.indent-2 { padding-left: 40px; }
+
+    /* Editor area */
+    .editor {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0;
+      position: relative;
+    }
+
+    /* ── Markdown Rendering ── */
+    .md-content {
+      padding: 24px 40px;
+      font-family: 'Inter', sans-serif;
+      line-height: 1.7;
+      max-width: 760px;
+    }
+    .md-content h1 {
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--vsc-text-bright);
+      margin-bottom: 8px;
+      letter-spacing: -0.3px;
+    }
+    .md-content h2 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--vsc-text-bright);
+      margin-top: 32px;
+      margin-bottom: 12px;
+    }
+    .md-content p {
+      font-size: 14px;
+      color: var(--vsc-text);
+      margin-bottom: 16px;
+    }
+    .md-content .meta {
+      font-size: 12px;
+      color: var(--vsc-text-muted);
+      margin-bottom: 24px;
+    }
+    .md-content code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      background: rgba(255,255,255,0.06);
+      padding: 2px 6px;
+      border-radius: 3px;
+      color: var(--syn-string);
+    }
+    .md-content .separator {
+      border: none;
+      border-top: 1px solid var(--vsc-border);
+      margin: 24px 0;
+    }
+
+    /* ── Code Block (static) ── */
+    .code-block {
+      background: #1a1a2e;
+      border: 1px solid var(--vsc-border);
+      border-radius: 8px;
+      margin: 16px 0;
+      overflow: hidden;
+    }
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: rgba(255,255,255,0.03);
+      border-bottom: 1px solid var(--vsc-border);
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--vsc-text-muted);
+    }
+    .code-body {
+      padding: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      line-height: 1.6;
+      overflow-x: auto;
+    }
+    .code-body .line-num {
+      display: inline-block;
+      width: 28px;
+      text-align: right;
+      margin-right: 16px;
+      color: var(--vsc-line-number);
+      user-select: none;
+    }
+
+    /* ── Run Block ── */
+    .run-block {
+      border: 1px solid var(--stereo-run-border);
+      border-radius: 8px;
+      margin: 20px 0;
+      overflow: hidden;
+      position: relative;
+    }
+    .run-block::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 8px;
+      padding: 1px;
+      background: linear-gradient(135deg, oklch(0.50 0.15 250), oklch(0.40 0.10 280));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+    .run-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: var(--stereo-run-bg);
+      border-bottom: 1px solid var(--stereo-run-border);
+    }
+    .run-header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .run-badge {
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      padding: 2px 8px;
+      border-radius: 3px;
+      background: oklch(0.35 0.10 250);
+      color: oklch(0.80 0.12 250);
+    }
+    .run-lang {
+      color: var(--vsc-text-muted);
+    }
+    .run-actions {
+      display: flex;
+      gap: 4px;
+    }
+    .run-action-btn {
+      padding: 3px 10px;
+      font-size: 10px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .run-action-btn.source {
+      background: rgba(255,255,255,0.08);
+      color: var(--vsc-text-muted);
+    }
+    .run-action-btn.run {
+      background: oklch(0.35 0.10 250);
+      color: oklch(0.85 0.10 250);
+    }
+
+    /* ── Source View (inside run block) ── */
+    .run-source {
+      padding: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      line-height: 1.6;
+      background: var(--stereo-run-bg);
+    }
+
+    /* ── Live Output (replaces code block) ── */
+    .live-output {
+      background: var(--live-bg);
+      padding: 20px;
+    }
+
+    /* Dashboard widgets */
+    .dash-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .dash-card {
+      background: var(--live-card);
+      border: 1px solid var(--live-border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .dash-card-label {
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+    .dash-card-value {
+      font-size: 24px;
+      font-weight: 300;
+      font-variant-numeric: tabular-nums;
+      color: #fff;
+    }
+    .dash-card-value.success { color: oklch(0.78 0.15 160); }
+    .dash-card-value.danger { color: oklch(0.75 0.14 40); }
+    .dash-card-value.caution { color: oklch(0.82 0.14 85); }
+    .dash-card-sub {
+      font-size: 11px;
+      color: #555;
+      margin-top: 4px;
+    }
+
+    /* Sparkline */
+    .sparkline-row {
+      background: var(--live-card);
+      border: 1px solid var(--live-border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .sparkline-label {
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #666;
+      margin-bottom: 12px;
+    }
+    .sparkline-svg { width: 100%; }
+    .sparkline-bars {
+      display: flex;
+      gap: 3px;
+      align-items: flex-end;
+      height: 48px;
+    }
+    .sparkline-bar {
+      flex: 1;
+      border-radius: 2px 2px 0 0;
+      min-width: 4px;
+      transition: height 0.3s ease;
+    }
+    .sparkline-bar.ok { background: oklch(0.55 0.12 160); }
+    .sparkline-bar.warn { background: oklch(0.65 0.14 85); }
+    .sparkline-bar.err { background: oklch(0.60 0.14 40); }
+    .sparkline-x-axis {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 6px;
+      font-size: 9px;
+      color: #444;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Status table */
+    .status-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+    }
+    .status-table th {
+      text-align: left;
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #555;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--live-border);
+    }
+    .status-table td {
+      font-size: 12px;
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+      color: var(--vsc-text);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .status-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+    .status-dot.ok { background: oklch(0.70 0.18 160); }
+    .status-dot.warn { background: oklch(0.75 0.18 85); }
+    .status-dot.err { background: oklch(0.65 0.18 40); }
+
+    /* ── Status Bar ── */
+    .statusbar {
+      height: 24px;
+      background: var(--vsc-statusbar);
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      font-size: 11px;
+      font-family: 'Inter', sans-serif;
+      color: rgba(255,255,255,0.8);
+      justify-content: space-between;
+    }
+    .statusbar-left, .statusbar-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .statusbar-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .stereo-status {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .stereo-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: oklch(0.78 0.18 160);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* ── View: Source Mode ── */
+    .source-mode .md-content { display: none; }
+    .source-mode .source-raw { display: block; }
+
+    .source-raw {
+      display: none;
+      padding: 16px 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      line-height: 1.7;
+    }
+    .src-line {
+      display: flex;
+      padding: 0 16px 0 0;
+      min-height: 20px;
+    }
+    .src-line:hover { background: var(--vsc-line-highlight); }
+    .src-line .ln {
+      width: 48px;
+      text-align: right;
+      padding-right: 16px;
+      color: var(--vsc-line-number);
+      user-select: none;
+      flex-shrink: 0;
+    }
+    .src-line .code {
+      flex: 1;
+      white-space: pre;
+    }
+    .src-line.run-fence .code {
+      color: var(--stereo-glow);
+    }
+    .src-line .kw { color: var(--syn-keyword); }
+    .src-line .str { color: var(--syn-string); }
+    .src-line .fn { color: var(--syn-function); }
+    .src-line .cm { color: var(--syn-comment); }
+    .src-line .tp { color: var(--syn-type); }
+    .src-line .vr { color: var(--syn-variable); }
+    .src-line .num { color: var(--syn-number); }
+    .src-line .tg { color: var(--syn-tag); }
+    .src-line .at { color: var(--syn-attr); }
+    .src-line .op { color: var(--syn-operator); }
+    .src-line .hd { color: #569cd6; font-weight: 600; }
+
+    /* ── Annotations ── */
+    .callout-container {
+      max-width: 1200px;
+      margin: 0 auto 60px;
+      padding: 0 24px;
+    }
+    .callout-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .callout {
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      border-radius: 12px;
+      padding: 24px;
+    }
+    .callout-num {
+      font-size: 11px;
+      font-weight: 600;
+      color: oklch(0.72 0.12 250);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 8px;
+    }
+    .callout h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .callout p {
+      font-size: 12px;
+      color: #888;
+      line-height: 1.6;
+    }
+
+    /* ── Footer ── */
+    .page-footer {
+      text-align: center;
+      padding: 40px 24px 60px;
+      font-size: 11px;
+      color: #444;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      border-top: 1px solid #222;
+    }
+
+    /* View states */
+    .view { display: none; }
+    .view.active { display: block; }
+  </style>
+</head>
+<body>
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1><span>Stereo</span> — VS Code Extension Wireframe</h1>
+    <p>Executable markdown. Live output inline. Secrets stay server-side.</p>
+  </div>
+
+  <!-- View Switcher -->
+  <div class="view-switcher">
+    <button class="view-btn active" onclick="switchView('rendered')">Rendered View</button>
+    <button class="view-btn" onclick="switchView('source')">Source View</button>
+    <button class="view-btn" onclick="switchView('split')">Split View</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- VIEW 1: Rendered (default) -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="view active" id="view-rendered">
+    <div class="vscode-frame">
+      <div class="titlebar">
+        <div class="traffic-lights">
+          <div class="traffic-light tl-close"></div>
+          <div class="traffic-light tl-min"></div>
+          <div class="traffic-light tl-max"></div>
+        </div>
+        <div class="titlebar-text">api-health.md — ops-runbooks — Visual Studio Code</div>
+      </div>
+      <div class="tabbar">
+        <div class="tab active">
+          <span class="tab-icon">&#x25C7;</span>
+          api-health.md
+          <span class="tab-close">&times;</span>
+        </div>
+        <div class="tab">
+          <span class="tab-icon">&#x25CB;</span>
+          README.md
+          <span class="tab-close">&times;</span>
+        </div>
+        <div class="tab">
+          <span class="tab-icon">&#x25CB;</span>
+          .env
+          <span class="tab-close">&times;</span>
+        </div>
+      </div>
+      <div class="vscode-body">
+        <div class="activitybar">
+          <div class="activity-icon active" title="Explorer">&#x2395;</div>
+          <div class="activity-icon" title="Search">&#x2315;</div>
+          <div class="activity-icon" title="Source Control">&#x2442;</div>
+          <div class="activity-icon" title="Stereo">&#x266B;</div>
+        </div>
+        <div class="sidebar">
+          <div class="sidebar-header">ops-runbooks</div>
+          <div class="file-tree">
+            <div class="file-item folder">&#x25BE; docs</div>
+            <div class="file-item indent-1 active">&#x25C7; api-health.md</div>
+            <div class="file-item indent-1">&#x25CB; deploy-checklist.md</div>
+            <div class="file-item indent-1">&#x25CB; incident-response.md</div>
+            <div class="file-item folder">&#x25BE; templates</div>
+            <div class="file-item indent-1">&#x25CB; prd-template.md</div>
+            <div class="file-item indent-1">&#x25CB; rfc-template.md</div>
+            <div class="file-item">&#x25CB; .env</div>
+            <div class="file-item">&#x25CB; .gitignore</div>
+            <div class="file-item">&#x25CB; README.md</div>
+          </div>
+        </div>
+        <div class="editor">
+          <div class="md-content">
+            <h1>API Health Dashboard</h1>
+            <div class="meta">Last updated: Mar 12, 2026 &middot; Auto-refreshes every 30s &middot; Trey Anderson</div>
+
+            <p>Real-time health status for production API services. This runbook auto-queries the <code>/health</code> endpoint and renders current status inline.</p>
+
+            <hr class="separator">
+
+            <!-- RUN BLOCK: Live Dashboard -->
+            <div class="run-block">
+              <div class="run-header">
+                <div class="run-header-left">
+                  <span class="run-badge">live</span>
+                  <span class="run-lang">tsx &middot; auto-refresh 30s</span>
+                </div>
+                <div class="run-actions">
+                  <button class="run-action-btn source" onclick="toggleSource(this)">Source</button>
+                  <button class="run-action-btn run">&#x25B6; Run</button>
+                </div>
+              </div>
+
+              <!-- Source (hidden by default in rendered view) -->
+              <div class="run-source" style="display: none;">
+                <div><span style="color: var(--syn-keyword)">const</span> <span style="color: var(--syn-variable)">res</span> = <span style="color: var(--syn-keyword)">await</span> <span style="color: var(--syn-function)">fetch</span>(<span style="color: var(--syn-string)">"{{env.API_URL}}/health"</span>);</div>
+                <div><span style="color: var(--syn-keyword)">const</span> <span style="color: var(--syn-variable)">data</span> = <span style="color: var(--syn-keyword)">await</span> <span style="color: var(--syn-variable)">res</span>.<span style="color: var(--syn-function)">json</span>();</div>
+                <div>&nbsp;</div>
+                <div><span style="color: var(--syn-tag)">&lt;DashGrid</span> <span style="color: var(--syn-attr)">cols</span>=<span style="color: var(--syn-number)">{3}</span><span style="color: var(--syn-tag)">&gt;</span></div>
+                <div>&nbsp; {<span style="color: var(--syn-variable)">data</span>.<span style="color: var(--syn-variable)">services</span>.<span style="color: var(--syn-function)">map</span>(<span style="color: var(--syn-variable)">s</span> <span style="color: var(--syn-keyword)">=&gt;</span> (</div>
+                <div>&nbsp; &nbsp; <span style="color: var(--syn-tag)">&lt;MetricCard</span></div>
+                <div>&nbsp; &nbsp; &nbsp; <span style="color: var(--syn-attr)">label</span>=<span style="color: var(--syn-string)">{s.name}</span></div>
+                <div>&nbsp; &nbsp; &nbsp; <span style="color: var(--syn-attr)">value</span>=<span style="color: var(--syn-string)">{s.latency + "ms"}</span></div>
+                <div>&nbsp; &nbsp; &nbsp; <span style="color: var(--syn-attr)">status</span>=<span style="color: var(--syn-string)">{s.healthy ? "success" : "danger"}</span></div>
+                <div>&nbsp; &nbsp; <span style="color: var(--syn-tag)">/&gt;</span></div>
+                <div>&nbsp; ))}</div>
+                <div><span style="color: var(--syn-tag)">&lt;/DashGrid&gt;</span></div>
+              </div>
+
+              <!-- Live output (visible by default) -->
+              <div class="live-output">
+                <div class="dash-grid">
+                  <div class="dash-card">
+                    <div class="dash-card-label">Auth Service</div>
+                    <div class="dash-card-value success">12ms</div>
+                    <div class="dash-card-sub">99.98% uptime</div>
+                  </div>
+                  <div class="dash-card">
+                    <div class="dash-card-label">Billing API</div>
+                    <div class="dash-card-value caution">245ms</div>
+                    <div class="dash-card-sub">99.91% &middot; degraded</div>
+                  </div>
+                  <div class="dash-card">
+                    <div class="dash-card-label">Search Index</div>
+                    <div class="dash-card-value success">8ms</div>
+                    <div class="dash-card-sub">99.99% uptime</div>
+                  </div>
+                </div>
+
+                <!-- Sparkline -->
+                <div class="sparkline-row" style="margin-bottom: 12px;">
+                  <div class="sparkline-label">Response Time &middot; Last 24h</div>
+                  <div class="sparkline-bars">
+                    <div class="sparkline-bar ok" style="height: 30%"></div>
+                    <div class="sparkline-bar ok" style="height: 25%"></div>
+                    <div class="sparkline-bar ok" style="height: 28%"></div>
+                    <div class="sparkline-bar ok" style="height: 22%"></div>
+                    <div class="sparkline-bar ok" style="height: 35%"></div>
+                    <div class="sparkline-bar ok" style="height: 30%"></div>
+                    <div class="sparkline-bar ok" style="height: 27%"></div>
+                    <div class="sparkline-bar ok" style="height: 32%"></div>
+                    <div class="sparkline-bar ok" style="height: 29%"></div>
+                    <div class="sparkline-bar warn" style="height: 55%"></div>
+                    <div class="sparkline-bar warn" style="height: 68%"></div>
+                    <div class="sparkline-bar err" style="height: 95%"></div>
+                    <div class="sparkline-bar err" style="height: 88%"></div>
+                    <div class="sparkline-bar warn" style="height: 60%"></div>
+                    <div class="sparkline-bar ok" style="height: 38%"></div>
+                    <div class="sparkline-bar ok" style="height: 30%"></div>
+                    <div class="sparkline-bar ok" style="height: 25%"></div>
+                    <div class="sparkline-bar ok" style="height: 28%"></div>
+                    <div class="sparkline-bar ok" style="height: 22%"></div>
+                    <div class="sparkline-bar ok" style="height: 20%"></div>
+                    <div class="sparkline-bar ok" style="height: 26%"></div>
+                    <div class="sparkline-bar ok" style="height: 24%"></div>
+                    <div class="sparkline-bar ok" style="height: 28%"></div>
+                    <div class="sparkline-bar ok" style="height: 22%"></div>
+                  </div>
+                  <div class="sparkline-x-axis">
+                    <span>00:00</span>
+                    <span>06:00</span>
+                    <span>12:00</span>
+                    <span>18:00</span>
+                    <span>now</span>
+                  </div>
+                </div>
+
+                <!-- Status table -->
+                <table class="status-table">
+                  <thead>
+                    <tr>
+                      <th>Service</th>
+                      <th>Status</th>
+                      <th>Latency</th>
+                      <th>Region</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><span class="status-dot ok"></span>auth-service</td>
+                      <td style="color: oklch(0.78 0.15 160);">healthy</td>
+                      <td>12ms</td>
+                      <td>us-east-1</td>
+                    </tr>
+                    <tr>
+                      <td><span class="status-dot warn"></span>billing-api</td>
+                      <td style="color: oklch(0.82 0.14 85);">degraded</td>
+                      <td>245ms</td>
+                      <td>us-east-1</td>
+                    </tr>
+                    <tr>
+                      <td><span class="status-dot ok"></span>search-index</td>
+                      <td style="color: oklch(0.78 0.15 160);">healthy</td>
+                      <td>8ms</td>
+                      <td>us-west-2</td>
+                    </tr>
+                    <tr>
+                      <td><span class="status-dot ok"></span>user-service</td>
+                      <td style="color: oklch(0.78 0.15 160);">healthy</td>
+                      <td>15ms</td>
+                      <td>us-east-1</td>
+                    </tr>
+                    <tr>
+                      <td><span class="status-dot ok"></span>notification-svc</td>
+                      <td style="color: oklch(0.78 0.15 160);">healthy</td>
+                      <td>23ms</td>
+                      <td>eu-west-1</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <h2>Notes</h2>
+            <p>Billing API latency spike at 12:30 UTC was caused by a slow Stripe webhook retry. The retry queue cleared by 13:15 and latency returned to normal. No user-facing impact.</p>
+            <p>Search index was migrated to <code>us-west-2</code> on March 10. Latency improved from 14ms to 8ms for West Coast users.</p>
+
+            <hr class="separator">
+
+            <p style="font-size: 12px; color: var(--vsc-text-muted);">Credentials loaded from <code>.env</code> via Stereo proxy. API keys never enter the JavaScript runtime.</p>
+          </div>
+        </div>
+      </div>
+      <div class="statusbar">
+        <div class="statusbar-left">
+          <span class="statusbar-item">&#x2442; main</span>
+          <span class="statusbar-item">&#x21BB; 0</span>
+          <span class="statusbar-item">&#x26A0; 0</span>
+        </div>
+        <div class="statusbar-right">
+          <span class="stereo-status">
+            <span class="stereo-dot"></span>
+            Stereo
+          </span>
+          <span class="statusbar-item">2 blocks live</span>
+          <span class="statusbar-item">Markdown</span>
+          <span class="statusbar-item">UTF-8</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- VIEW 2: Source -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="view" id="view-source">
+    <div class="vscode-frame">
+      <div class="titlebar">
+        <div class="traffic-lights">
+          <div class="traffic-light tl-close"></div>
+          <div class="traffic-light tl-min"></div>
+          <div class="traffic-light tl-max"></div>
+        </div>
+        <div class="titlebar-text">api-health.md — ops-runbooks — Visual Studio Code</div>
+      </div>
+      <div class="tabbar">
+        <div class="tab active">
+          <span class="tab-icon">&#x25C7;</span>
+          api-health.md
+          <span class="tab-close">&times;</span>
+        </div>
+      </div>
+      <div class="vscode-body" style="height: 550px;">
+        <div class="activitybar">
+          <div class="activity-icon active">&#x2395;</div>
+          <div class="activity-icon">&#x2315;</div>
+          <div class="activity-icon">&#x2442;</div>
+          <div class="activity-icon">&#x266B;</div>
+        </div>
+        <div class="editor" style="overflow-y: auto;">
+          <div class="source-raw" style="display: block;">
+            <div class="src-line"><span class="ln">1</span><span class="code"><span class="hd"># API Health Dashboard</span></span></div>
+            <div class="src-line"><span class="ln">2</span><span class="code"></span></div>
+            <div class="src-line"><span class="ln">3</span><span class="code"><span class="cm">Last updated: Mar 12, 2026 · Auto-refreshes every 30s</span></span></div>
+            <div class="src-line"><span class="ln">4</span><span class="code"></span></div>
+            <div class="src-line"><span class="ln">5</span><span class="code">Real-time health status for production API services.</span></div>
+            <div class="src-line"><span class="ln">6</span><span class="code">This runbook auto-queries the `/health` endpoint.</span></div>
+            <div class="src-line"><span class="ln">7</span><span class="code"></span></div>
+            <div class="src-line"><span class="ln">8</span><span class="code">---</span></div>
+            <div class="src-line"><span class="ln">9</span><span class="code"></span></div>
+            <div class="src-line run-fence"><span class="ln">10</span><span class="code">```tsx run refresh=30s</span></div>
+            <div class="src-line"><span class="ln">11</span><span class="code"><span class="kw">const</span> <span class="vr">res</span> = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">"{{env.API_URL}}/health"</span>);</span></div>
+            <div class="src-line"><span class="ln">12</span><span class="code"><span class="kw">const</span> <span class="vr">data</span> = <span class="kw">await</span> <span class="vr">res</span>.<span class="fn">json</span>();</span></div>
+            <div class="src-line"><span class="ln">13</span><span class="code"></span></div>
+            <div class="src-line"><span class="ln">14</span><span class="code"><span class="tg">&lt;DashGrid</span> <span class="at">cols</span>=<span class="num">{3}</span><span class="tg">&gt;</span></span></div>
+            <div class="src-line"><span class="ln">15</span><span class="code">  {<span class="vr">data</span>.<span class="vr">services</span>.<span class="fn">map</span>(<span class="vr">s</span> <span class="kw">=&gt;</span> (</span></div>
+            <div class="src-line"><span class="ln">16</span><span class="code">    <span class="tg">&lt;MetricCard</span></span></div>
+            <div class="src-line"><span class="ln">17</span><span class="code">      <span class="at">label</span>=<span class="str">{s.name}</span></span></div>
+            <div class="src-line"><span class="ln">18</span><span class="code">      <span class="at">value</span>=<span class="str">{s.latency + "ms"}</span></span></div>
+            <div class="src-line"><span class="ln">19</span><span class="code">      <span class="at">status</span>=<span class="str">{s.healthy ? "success" : "danger"}</span></span></div>
+            <div class="src-line"><span class="ln">20</span><span class="code">    <span class="tg">/&gt;</span></span></div>
+            <div class="src-line"><span class="ln">21</span><span class="code">  ))}</span></div>
+            <div class="src-line"><span class="ln">22</span><span class="code"><span class="tg">&lt;/DashGrid&gt;</span></span></div>
+            <div class="src-line"><span class="ln">23</span><span class="code"></span></div>
+            <div class="src-line"><span class="ln">24</span><span class="code"><span class="tg">&lt;Sparkline</span> <span class="at">data</span>=<span class="str">{data.latencyHistory}</span> <span class="at">hours</span>=<span class="num">{24}</span> <span class="tg">/&gt;</span></span></div>
+            <div class="src-line"><span class="ln">25</span><span class="code"></span></div>
+            <div class="src-line"><span class="ln">26</span><span class="code"><span class="tg">&lt;StatusTable</span> <span class="at">rows</span>=<span class="str">{data.services}</span> <span class="tg">/&gt;</span></span></div>
+            <div class="src-line run-fence"><span class="ln">27</span><span class="code">```</span></div>
+            <div class="src-line"><span class="ln">28</span><span class="code"></span></div>
+            <div class="src-line"><span class="ln">29</span><span class="code"><span class="hd">## Notes</span></span></div>
+            <div class="src-line"><span class="ln">30</span><span class="code"></span></div>
+            <div class="src-line"><span class="ln">31</span><span class="code">Billing API latency spike at 12:30 UTC was caused</span></div>
+            <div class="src-line"><span class="ln">32</span><span class="code">by a slow Stripe webhook retry. The retry queue</span></div>
+            <div class="src-line"><span class="ln">33</span><span class="code">cleared by 13:15 and latency returned to normal.</span></div>
+            <div class="src-line"><span class="ln">34</span><span class="code"></span></div>
+            <div class="src-line"><span class="ln">35</span><span class="code">Search index was migrated to `us-west-2` on</span></div>
+            <div class="src-line"><span class="ln">36</span><span class="code">March 10. Latency improved from 14ms to 8ms.</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="statusbar">
+        <div class="statusbar-left">
+          <span class="statusbar-item">&#x2442; main</span>
+          <span class="statusbar-item">Ln 10, Col 1</span>
+        </div>
+        <div class="statusbar-right">
+          <span class="stereo-status">
+            <span class="stereo-dot"></span>
+            Stereo
+          </span>
+          <span class="statusbar-item">1 run block</span>
+          <span class="statusbar-item">Markdown</span>
+          <span class="statusbar-item">UTF-8</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- VIEW 3: Split -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="view" id="view-split">
+    <div class="vscode-frame">
+      <div class="titlebar">
+        <div class="traffic-lights">
+          <div class="traffic-light tl-close"></div>
+          <div class="traffic-light tl-min"></div>
+          <div class="traffic-light tl-max"></div>
+        </div>
+        <div class="titlebar-text">api-health.md — ops-runbooks — Visual Studio Code</div>
+      </div>
+      <div class="tabbar">
+        <div class="tab active">
+          <span class="tab-icon">&#x25C7;</span>
+          api-health.md
+          <span class="tab-close">&times;</span>
+        </div>
+      </div>
+      <div class="vscode-body" style="height: 550px;">
+        <div class="activitybar">
+          <div class="activity-icon active">&#x2395;</div>
+          <div class="activity-icon">&#x2315;</div>
+          <div class="activity-icon">&#x2442;</div>
+          <div class="activity-icon">&#x266B;</div>
+        </div>
+        <!-- Split: source on left -->
+        <div style="flex: 1; display: flex; border-right: 1px solid var(--vsc-border); overflow-y: auto;">
+          <div class="source-raw" style="display: block; flex: 1;">
+            <div class="src-line"><span class="ln">1</span><span class="code"><span class="hd"># API Health Dashboard</span></span></div>
+            <div class="src-line"><span class="ln">2</span><span class="code"></span></div>
+            <div class="src-line"><span class="ln">3</span><span class="code"><span class="cm">Last updated: Mar 12, 2026</span></span></div>
+            <div class="src-line"><span class="ln">4</span><span class="code"></span></div>
+            <div class="src-line"><span class="ln">5</span><span class="code">---</span></div>
+            <div class="src-line"><span class="ln">6</span><span class="code"></span></div>
+            <div class="src-line run-fence"><span class="ln">7</span><span class="code">```tsx run refresh=30s</span></div>
+            <div class="src-line"><span class="ln">8</span><span class="code"><span class="kw">const</span> <span class="vr">res</span> = <span class="kw">await</span> <span class="fn">fetch</span>(</span></div>
+            <div class="src-line"><span class="ln">9</span><span class="code">  <span class="str">"{{env.API_URL}}/health"</span></span></div>
+            <div class="src-line"><span class="ln">10</span><span class="code">);</span></div>
+            <div class="src-line"><span class="ln">11</span><span class="code"><span class="kw">const</span> <span class="vr">data</span> = <span class="kw">await</span> <span class="vr">res</span>.<span class="fn">json</span>();</span></div>
+            <div class="src-line"><span class="ln">12</span><span class="code"></span></div>
+            <div class="src-line"><span class="ln">13</span><span class="code"><span class="tg">&lt;DashGrid</span> <span class="at">cols</span>=<span class="num">{3}</span><span class="tg">&gt;</span></span></div>
+            <div class="src-line"><span class="ln">14</span><span class="code">  {<span class="vr">data</span>.<span class="vr">services</span>.<span class="fn">map</span>(<span class="vr">s</span> <span class="kw">=&gt;</span></span></div>
+            <div class="src-line"><span class="ln">15</span><span class="code">    <span class="tg">&lt;MetricCard</span> ... <span class="tg">/&gt;</span></span></div>
+            <div class="src-line"><span class="ln">16</span><span class="code">  )}</span></div>
+            <div class="src-line"><span class="ln">17</span><span class="code"><span class="tg">&lt;/DashGrid&gt;</span></span></div>
+            <div class="src-line"><span class="ln">18</span><span class="code"><span class="tg">&lt;Sparkline</span> ... <span class="tg">/&gt;</span></span></div>
+            <div class="src-line"><span class="ln">19</span><span class="code"><span class="tg">&lt;StatusTable</span> ... <span class="tg">/&gt;</span></span></div>
+            <div class="src-line run-fence"><span class="ln">20</span><span class="code">```</span></div>
+            <div class="src-line"><span class="ln">21</span><span class="code"></span></div>
+            <div class="src-line"><span class="ln">22</span><span class="code"><span class="hd">## Notes</span></span></div>
+            <div class="src-line"><span class="ln">23</span><span class="code">Billing API latency spike...</span></div>
+          </div>
+        </div>
+        <!-- Split: rendered on right -->
+        <div style="flex: 1; overflow-y: auto;">
+          <div class="live-output" style="min-height: 100%;">
+            <div style="padding: 16px 8px 8px; font-size: 18px; font-weight: 600; color: #fff;">API Health Dashboard</div>
+            <div style="padding: 0 8px 16px; font-size: 11px; color: #666;">Mar 12, 2026 · Auto-refreshes every 30s</div>
+            <div class="dash-grid" style="padding: 0 8px;">
+              <div class="dash-card">
+                <div class="dash-card-label">Auth</div>
+                <div class="dash-card-value success">12ms</div>
+              </div>
+              <div class="dash-card">
+                <div class="dash-card-label">Billing</div>
+                <div class="dash-card-value caution">245ms</div>
+              </div>
+              <div class="dash-card">
+                <div class="dash-card-label">Search</div>
+                <div class="dash-card-value success">8ms</div>
+              </div>
+            </div>
+            <div style="padding: 12px 8px;">
+              <div class="sparkline-row">
+                <div class="sparkline-label">Response Time · 24h</div>
+                <div class="sparkline-bars">
+                  <div class="sparkline-bar ok" style="height: 30%"></div>
+                  <div class="sparkline-bar ok" style="height: 25%"></div>
+                  <div class="sparkline-bar ok" style="height: 28%"></div>
+                  <div class="sparkline-bar ok" style="height: 35%"></div>
+                  <div class="sparkline-bar warn" style="height: 55%"></div>
+                  <div class="sparkline-bar err" style="height: 95%"></div>
+                  <div class="sparkline-bar warn" style="height: 60%"></div>
+                  <div class="sparkline-bar ok" style="height: 30%"></div>
+                  <div class="sparkline-bar ok" style="height: 25%"></div>
+                  <div class="sparkline-bar ok" style="height: 22%"></div>
+                  <div class="sparkline-bar ok" style="height: 24%"></div>
+                  <div class="sparkline-bar ok" style="height: 22%"></div>
+                </div>
+              </div>
+            </div>
+            <div style="padding: 0 8px;">
+              <table class="status-table">
+                <thead><tr><th>Service</th><th>Status</th><th>Latency</th></tr></thead>
+                <tbody>
+                  <tr><td><span class="status-dot ok"></span>auth</td><td style="color: oklch(0.78 0.15 160)">healthy</td><td>12ms</td></tr>
+                  <tr><td><span class="status-dot warn"></span>billing</td><td style="color: oklch(0.82 0.14 85)">degraded</td><td>245ms</td></tr>
+                  <tr><td><span class="status-dot ok"></span>search</td><td style="color: oklch(0.78 0.15 160)">healthy</td><td>8ms</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="statusbar">
+        <div class="statusbar-left">
+          <span class="statusbar-item">&#x2442; main</span>
+        </div>
+        <div class="statusbar-right">
+          <span class="stereo-status">
+            <span class="stereo-dot"></span>
+            Stereo
+          </span>
+          <span class="statusbar-item">Split</span>
+          <span class="statusbar-item">Markdown</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Callouts -->
+  <div class="callout-container">
+    <div class="callout-grid">
+      <div class="callout">
+        <div class="callout-num">01</div>
+        <h3>```tsx run</h3>
+        <p>The magic annotation. Any fenced code block with <code>run</code> becomes executable. Add <code>refresh=30s</code> for auto-polling. The block renders its output inline, replacing the code fence. Click "Source" to toggle back.</p>
+      </div>
+      <div class="callout">
+        <div class="callout-num">02</div>
+        <h3>{{env.API_URL}}</h3>
+        <p>Mustache syntax for credential injection. The Rust proxy sidecar reads your <code>.env</code> file and injects values at the network layer. JavaScript never sees the raw secret. Works with any HTTP call inside a run block.</p>
+      </div>
+      <div class="callout">
+        <div class="callout-num">03</div>
+        <h3>Built-in Components</h3>
+        <p><code>&lt;DashGrid&gt;</code>, <code>&lt;MetricCard&gt;</code>, <code>&lt;Sparkline&gt;</code>, <code>&lt;StatusTable&gt;</code> — a small standard library of dashboard primitives. Styled with Tailwind. Import your own from <code>node_modules</code>.</p>
+      </div>
+      <div class="callout">
+        <div class="callout-num">04</div>
+        <h3>Three View Modes</h3>
+        <p><strong>Rendered</strong>: WYSIWYG with live output inline. <strong>Source</strong>: raw markdown with syntax-highlighted run blocks. <strong>Split</strong>: source on left, live output on right. Toggle via command palette or status bar.</p>
+      </div>
+      <div class="callout">
+        <div class="callout-num">05</div>
+        <h3>AI Writes Markdown</h3>
+        <p>Claude Code, Copilot, Cursor — they all edit <code>.md</code> files natively. The extension watches for changes and hot-reloads run blocks. No special integration needed. The agent writes a code fence, the extension runs it.</p>
+      </div>
+      <div class="callout">
+        <div class="callout-num">06</div>
+        <h3>Status Bar: Stereo</h3>
+        <p>Green dot = proxy running, blocks executing. Shows count of live blocks. Click to open the Stereo panel: proxy logs, env var status, block execution history, error traces.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="page-footer">
+    Stereo &middot; VS Code Extension Concept &middot; March 2026
+  </div>
+
+  <script>
+    function switchView(view) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('view-' + view).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    function toggleSource(btn) {
+      const block = btn.closest('.run-block');
+      const source = block.querySelector('.run-source');
+      const output = block.querySelector('.live-output');
+      if (source.style.display === 'none') {
+        source.style.display = 'block';
+        output.style.display = 'none';
+        btn.textContent = 'Output';
+      } else {
+        source.style.display = 'none';
+        output.style.display = 'block';
+        btn.textContent = 'Source';
+      }
+    }
+  </script>
+</body>
+</html>
