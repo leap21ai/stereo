@@ -603,6 +603,231 @@
       .pricing-grid { grid-template-columns: 1fr; }
     }
 
+    /* ---- GETTING STARTED ---- */
+    .getting-started {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .gs-steps {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 48px;
+    }
+
+    .gs-step {
+      display: grid;
+      grid-template-columns: 56px 1fr;
+      gap: 24px;
+    }
+
+    .gs-num {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--accent-dim);
+      border: 1px solid var(--accent-border);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .gs-text h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-heading);
+      margin-bottom: 8px;
+    }
+
+    .gs-text p {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    .gs-text p:last-child { margin-bottom: 0; }
+
+    /* Inline VS Code mockup */
+    .gs-mock {
+      background: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 10px;
+      overflow: hidden;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .gs-mock-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: #252526;
+      border-bottom: 1px solid #333;
+      font-family: "Inter", sans-serif;
+      font-size: 11px;
+      color: #666;
+    }
+
+    .gs-mock-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .gs-mock-dot:nth-child(1) { background: #ff5f57; }
+    .gs-mock-dot:nth-child(2) { background: #febc2e; }
+    .gs-mock-dot:nth-child(3) { background: #28c840; }
+
+    .gs-mock-body {
+      padding: 16px 20px;
+      color: #d4d4d4;
+      overflow-x: auto;
+    }
+
+    .gs-mock-body .kw { color: #569cd6; }
+    .gs-mock-body .str { color: #ce9178; }
+    .gs-mock-body .type { color: #4ec9b0; }
+    .gs-mock-body .attr { color: #9cdcfe; }
+    .gs-mock-body .comment { color: #6a9955; }
+    .gs-mock-body .num { color: #b5cea8; }
+    .gs-mock-body .fn { color: #dcdcaa; }
+    .gs-mock-body .punct { color: #808080; }
+
+    /* Command palette mockup */
+    .gs-palette {
+      background: #252526;
+      border: 1px solid #444;
+      border-radius: 8px;
+      max-width: 440px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .gs-palette-input {
+      padding: 10px 14px;
+      font-size: 13px;
+      color: #d4d4d4;
+      border-bottom: 1px solid #333;
+      font-family: "Inter", sans-serif;
+    }
+
+    .gs-palette-input span { color: #888; }
+
+    .gs-palette-item {
+      padding: 8px 14px;
+      font-size: 13px;
+      color: #d4d4d4;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: "Inter", sans-serif;
+    }
+
+    .gs-palette-item.active {
+      background: oklch(0.25 0.06 250);
+    }
+
+    .gs-palette-icon {
+      width: 16px;
+      height: 16px;
+      border-radius: 3px;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .gs-palette-shortcut {
+      margin-left: auto;
+      font-size: 11px;
+      color: #666;
+      font-family: "JetBrains Mono", monospace;
+    }
+
+    /* Copy button */
+    .gs-copy {
+      position: relative;
+    }
+
+    .gs-copy-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: #333;
+      border: 1px solid #444;
+      color: #888;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: "Inter", sans-serif;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .gs-copy-btn:hover {
+      color: #d4d4d4;
+      border-color: #666;
+    }
+
+    /* Output mockup */
+    .gs-output {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .gs-output-card {
+      background: #252526;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 14px;
+    }
+
+    .gs-output-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #666;
+      font-family: "Inter", sans-serif;
+      margin-bottom: 4px;
+    }
+
+    .gs-output-val {
+      font-size: 24px;
+      font-weight: 300;
+      color: #fff;
+      font-variant-numeric: tabular-nums;
+      font-family: "Inter", sans-serif;
+    }
+
+    .gs-output-val.green { color: oklch(0.70 0.15 160); }
+
+    /* Keyboard shortcut badge */
+    kbd {
+      display: inline-block;
+      background: #252526;
+      border: 1px solid #444;
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-family: "Inter", sans-serif;
+      font-size: 12px;
+      color: #d4d4d4;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 768px) {
+      .gs-step { grid-template-columns: 1fr; }
+      .gs-num { margin-bottom: -12px; }
+      .gs-output { grid-template-columns: 1fr; }
+    }
+
     /* ---- CTA FOOTER ---- */
     .cta-footer {
       padding: 80px 0;
@@ -736,27 +961,137 @@
     </div>
   </section>
 
-  <!-- How it works -->
-  <section class="how" id="how">
+  <!-- Getting Started -->
+  <section class="getting-started" id="how">
     <div class="container">
-      <div class="section-label">How it works</div>
-      <h2 class="section-title">Three steps. No config.</h2>
-      <div class="steps">
-        <div class="step">
-          <div class="step-num">1</div>
-          <h3>Write executable blocks</h3>
-          <p>Type <code>stereo</code> for instant templates, or add <code>```tsx run</code> to any code block in a standard <code>.md</code> file. That's the only syntax change.</p>
+      <div class="section-label">Getting Started</div>
+      <h2 class="section-title">Up and running in 60 seconds.</h2>
+
+      <div class="gs-steps">
+
+        <!-- Step 1: Install -->
+        <div class="gs-step">
+          <div class="gs-num">1</div>
+          <div class="gs-text">
+            <h3>Install the extension</h3>
+            <p>Open VS Code, press <kbd>Cmd+Shift+X</kbd> (or <kbd>Ctrl+Shift+X</kbd>), search <strong>"Stereo"</strong>, and click Install. That's it.</p>
+            <p>Or run this in your terminal:</p>
+            <div class="gs-mock gs-copy">
+              <div class="gs-mock-body" style="padding: 12px 16px;">
+                <span style="color: #888;">$</span> code --install-extension leap21.stereo
+              </div>
+              <button class="gs-copy-btn" onclick="navigator.clipboard.writeText('code --install-extension leap21.stereo');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)">Copy</button>
+            </div>
+          </div>
         </div>
-        <div class="step">
-          <div class="step-num">2</div>
-          <h3>Open Stereo preview</h3>
-          <p>Press <code>Ctrl+Shift+M</code> to open the Stereo panel alongside your editor. Split view, side by side.</p>
+
+        <!-- Step 2: Create a file -->
+        <div class="gs-step">
+          <div class="gs-num">2</div>
+          <div class="gs-text">
+            <h3>Create a <code>.md</code> file with a run block</h3>
+            <p>Open any <code>.md</code> file. Type <code>stereo</code> and press <kbd>Tab</kbd> to expand a ready-made template. Or paste this:</p>
+            <div class="gs-mock gs-copy">
+              <div class="gs-mock-bar">
+                <div class="gs-mock-dot"></div>
+                <div class="gs-mock-dot"></div>
+                <div class="gs-mock-dot"></div>
+                <span style="margin-left: 8px;">dashboard.md</span>
+              </div>
+              <div class="gs-mock-body"><pre style="margin:0;font:inherit;"><span class="comment"># My Dashboard</span>
+
+<span class="punct">```</span><span class="type">tsx run</span>
+<span class="punct">&lt;</span><span class="type">DashGrid</span> <span class="attr">cols</span><span class="punct">={</span><span class="num">2</span><span class="punct">}&gt;</span>
+  <span class="punct">&lt;</span><span class="type">MetricCard</span>
+    <span class="attr">label</span><span class="punct">=</span><span class="str">"Uptime"</span>
+    <span class="attr">value</span><span class="punct">=</span><span class="str">"99.97%"</span>
+    <span class="attr">status</span><span class="punct">=</span><span class="str">"success"</span> <span class="punct">/&gt;</span>
+  <span class="punct">&lt;</span><span class="type">MetricCard</span>
+    <span class="attr">label</span><span class="punct">=</span><span class="str">"Latency"</span>
+    <span class="attr">value</span><span class="punct">=</span><span class="str">"42ms"</span>
+    <span class="attr">status</span><span class="punct">=</span><span class="str">"neutral"</span> <span class="punct">/&gt;</span>
+<span class="punct">&lt;/</span><span class="type">DashGrid</span><span class="punct">&gt;</span>
+<span class="punct">```</span></pre>
+              </div>
+              <button class="gs-copy-btn" onclick="navigator.clipboard.writeText('# My Dashboard\n\n```tsx run\n<DashGrid cols={2}>\n  <MetricCard\n    label=&quot;Uptime&quot;\n    value=&quot;99.97%&quot;\n    status=&quot;success&quot; />\n  <MetricCard\n    label=&quot;Latency&quot;\n    value=&quot;42ms&quot;\n    status=&quot;neutral&quot; />\n</DashGrid>\n```');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)">Copy</button>
+            </div>
+            <p style="margin-top: 12px; font-size: 13px; color: #666;">The only new syntax is <code style="background: var(--accent-dim); border: 1px solid var(--accent-border); color: var(--accent); padding: 1px 6px; border-radius: 3px;">```tsx run</code> instead of <code style="background: #2a2a2a; border: 1px solid #333; padding: 1px 6px; border-radius: 3px;">```tsx</code>. Everything else is standard markdown.</p>
+          </div>
         </div>
-        <div class="step">
-          <div class="step-num">3</div>
-          <h3>Click Run</h3>
-          <p>Hit the Run button on any block. Output renders inline: metrics, tables, charts. Auto-refresh optional.</p>
+
+        <!-- Step 3: Open preview -->
+        <div class="gs-step">
+          <div class="gs-num">3</div>
+          <div class="gs-text">
+            <h3>Open the Stereo preview</h3>
+            <p>Press <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd> to open the preview panel. Or use the Command Palette:</p>
+            <div class="gs-palette">
+              <div class="gs-palette-input">> <span>stereo</span></div>
+              <div class="gs-palette-item active">
+                <div class="gs-palette-icon"></div>
+                Stereo: Open Preview
+                <span class="gs-palette-shortcut">Ctrl+Shift+M</span>
+              </div>
+              <div class="gs-palette-item">
+                <div class="gs-palette-icon" style="opacity: 0.4;"></div>
+                Stereo: Run All Blocks
+              </div>
+            </div>
+            <p style="margin-top: 16px;">Stereo will also prompt you automatically when it detects run blocks in your file.</p>
+          </div>
         </div>
+
+        <!-- Step 4: See output -->
+        <div class="gs-step">
+          <div class="gs-num">4</div>
+          <div class="gs-text">
+            <h3>Click Run and see live output</h3>
+            <p>Each block gets a <strong>Run</strong> button. Click it, and the output renders right below:</p>
+            <div class="gs-mock">
+              <div class="gs-mock-bar">
+                <div class="gs-mock-dot"></div>
+                <div class="gs-mock-dot"></div>
+                <div class="gs-mock-dot"></div>
+                <span style="margin-left: 8px;">Stereo Preview</span>
+                <span style="margin-left: auto; color: oklch(0.70 0.15 160); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em;">10ms</span>
+              </div>
+              <div class="gs-mock-body" style="padding: 16px;">
+                <div class="gs-output">
+                  <div class="gs-output-card">
+                    <div class="gs-output-label">Uptime</div>
+                    <div class="gs-output-val green">99.97%</div>
+                  </div>
+                  <div class="gs-output-card">
+                    <div class="gs-output-label">Latency</div>
+                    <div class="gs-output-val">42ms</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p style="margin-top: 16px;">Add <code style="background: var(--accent-dim); border: 1px solid var(--accent-border); color: var(--accent); padding: 1px 6px; border-radius: 3px;">refresh=30s</code> after <code>tsx run</code> to auto-refresh. Use <code>fetch()</code> to pull live data from any API.</p>
+          </div>
+        </div>
+
+        <!-- Step 5: Built-in components -->
+        <div class="gs-step">
+          <div class="gs-num">5</div>
+          <div class="gs-text">
+            <h3>Use built-in components</h3>
+            <p>These are available in every run block with no imports needed:</p>
+            <div class="gs-mock">
+              <div class="gs-mock-body" style="padding: 14px 20px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px; font-family: 'Inter', sans-serif; font-size: 14px;">
+                  <div><span class="type" style="font-family: 'JetBrains Mono', monospace; font-size: 13px;">MetricCard</span> <span style="color: #666;">&mdash; KPI card with label, value, status</span></div>
+                  <div><span class="type" style="font-family: 'JetBrains Mono', monospace; font-size: 13px;">DashGrid</span> <span style="color: #666;">&mdash; responsive column layout</span></div>
+                  <div><span class="type" style="font-family: 'JetBrains Mono', monospace; font-size: 13px;">Sparkline</span> <span style="color: #666;">&mdash; inline bar chart</span></div>
+                  <div><span class="type" style="font-family: 'JetBrains Mono', monospace; font-size: 13px;">StatusTable</span> <span style="color: #666;">&mdash; table with status indicators</span></div>
+                </div>
+              </div>
+            </div>
+            <p style="margin-top: 16px;">Also available: <code>fetch()</code>, <code>console.log()</code>, <code>React</code>, <code>await</code>. Full JSX/TSX support.</p>
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
