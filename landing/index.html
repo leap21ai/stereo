@@ -470,6 +470,139 @@
       line-height: 1.6;
     }
 
+    /* ---- PRICING ---- */
+    .pricing {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .pricing-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px 28px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .pricing-card.featured {
+      border-color: var(--accent-border);
+      box-shadow: 0 0 40px rgba(56, 152, 236, 0.08);
+      position: relative;
+    }
+
+    .pricing-badge {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #111;
+      background: var(--accent);
+      padding: 4px 14px;
+      border-radius: 100px;
+      white-space: nowrap;
+    }
+
+    .pricing-tier {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .pricing-price {
+      font-size: 40px;
+      font-weight: 300;
+      color: var(--text-heading);
+      font-variant-numeric: tabular-nums;
+      margin-bottom: 4px;
+      line-height: 1;
+    }
+
+    .pricing-price span {
+      font-size: 15px;
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+
+    .pricing-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    .pricing-features {
+      list-style: none;
+      margin-bottom: 28px;
+      flex: 1;
+    }
+
+    .pricing-features li {
+      font-size: 14px;
+      color: var(--text);
+      padding: 6px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pricing-features li::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--success);
+      flex-shrink: 0;
+    }
+
+    .pricing-cta {
+      display: block;
+      text-align: center;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, border-color 0.2s;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      background: transparent;
+    }
+
+    .pricing-cta:hover {
+      border-color: var(--text-muted);
+      color: var(--text-heading);
+      text-decoration: none;
+    }
+
+    .pricing-cta.primary {
+      background: var(--accent);
+      color: #111;
+      border-color: transparent;
+    }
+
+    .pricing-cta.primary:hover { opacity: 0.9; }
+
+    @media (max-width: 768px) {
+      .pricing-grid { grid-template-columns: 1fr; }
+    }
+
     /* ---- CTA FOOTER ---- */
     .cta-footer {
       padding: 80px 0;
@@ -548,6 +681,7 @@
       <div class="nav-links">
         <a href="#how">How it works</a>
         <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
         <a href="https://github.com/leap21ai/stereo" target="_blank" rel="noopener">GitHub</a>
         <a href="https://marketplace.visualstudio.com/items?itemName=leap21.stereo" class="btn-primary" style="padding: 8px 18px; font-size: 13px; border-radius: 8px; color: #111;">Install</a>
       </div>
@@ -707,6 +841,60 @@
     </div>
   </section>
 
+  <!-- Pricing -->
+  <section class="pricing" id="pricing">
+    <div class="container">
+      <div class="section-label">Pricing</div>
+      <h2 class="section-title">Free forever. Pay only for team features.</h2>
+      <div class="pricing-grid">
+
+        <div class="pricing-card">
+          <div class="pricing-tier">Free</div>
+          <div class="pricing-price">$0</div>
+          <p class="pricing-desc">For individual developers</p>
+          <ul class="pricing-features">
+            <li>Unlimited run blocks</li>
+            <li>All built-in components</li>
+            <li>Auto-refresh</li>
+            <li>Secret injection via .env</li>
+            <li>Open source, MIT license</li>
+          </ul>
+          <a href="https://marketplace.visualstudio.com/items?itemName=leap21.stereo" class="pricing-cta" target="_blank" rel="noopener">Install Free</a>
+        </div>
+
+        <div class="pricing-card featured">
+          <div class="pricing-badge">Most Popular</div>
+          <div class="pricing-tier">Pro</div>
+          <div class="pricing-price">$12<span>/mo</span></div>
+          <p class="pricing-desc">For power users and small teams</p>
+          <ul class="pricing-features">
+            <li>Everything in Free</li>
+            <li>Priority support</li>
+            <li>Team shared dashboards</li>
+            <li>Custom component registry</li>
+            <li>3 machine activations</li>
+          </ul>
+          <button class="pricing-cta primary" onclick="startCheckout('pro')">Get Pro</button>
+        </div>
+
+        <div class="pricing-card">
+          <div class="pricing-tier">Enterprise</div>
+          <div class="pricing-price">$49<span>/seat/mo</span></div>
+          <p class="pricing-desc">For organizations at scale</p>
+          <ul class="pricing-features">
+            <li>Everything in Pro</li>
+            <li>SSO / SAML</li>
+            <li>Unlimited activations</li>
+            <li>Audit logs</li>
+            <li>Dedicated support channel</li>
+          </ul>
+          <button class="pricing-cta" onclick="startCheckout('enterprise')">Contact Sales</button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
   <!-- CTA Footer -->
   <section class="cta-footer">
     <div class="container">
@@ -730,5 +918,48 @@
     </div>
   </footer>
 
+  <script>
+    async function startCheckout(tier) {
+      const btn = event.target;
+      const originalText = btn.textContent;
+      btn.textContent = "Loading...";
+      btn.disabled = true;
+
+      try {
+        const res = await fetch("https://stereo-billing.leap21.workers.dev/api/checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            tier,
+            successUrl: window.location.origin + "?checkout=success",
+            cancelUrl: window.location.origin + "?checkout=cancel",
+          }),
+        });
+
+        const data = await res.json();
+        if (data.checkoutUrl) {
+          window.location.href = data.checkoutUrl;
+        } else {
+          throw new Error(data.error || "Checkout failed");
+        }
+      } catch (err) {
+        btn.textContent = originalText;
+        btn.disabled = false;
+        alert("Something went wrong. Please try again.");
+        console.error("Checkout error:", err);
+      }
+    }
+
+    // Handle checkout return
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("checkout") === "success") {
+      const banner = document.createElement("div");
+      banner.style.cssText = "position:fixed;top:0;left:0;right:0;padding:14px;background:oklch(0.30 0.08 160);color:oklch(0.90 0.10 160);text-align:center;font-size:14px;font-weight:500;z-index:200;";
+      banner.textContent = "Payment successful! Check your email for your license key.";
+      document.body.prepend(banner);
+      setTimeout(() => banner.remove(), 8000);
+      history.replaceState(null, "", window.location.pathname);
+    }
+  </script>
 </body>
 </html>
