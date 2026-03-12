@@ -57,9 +57,9 @@ Account: **@leap21ai**
 >
 > Install: https://marketplace.visualstudio.com/items?itemName=leap21.stereo
 >
-> Star/fork: https://github.com/leap21/stereo
+> Star/fork: https://gitlab.leap21llc.com/leap21/stereo
 >
-> Docs: https://stereo.dev
+> Docs: https://stereo.leap21llc.com
 >
 > We're shipping fast — come build with us.
 
