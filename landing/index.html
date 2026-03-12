@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stereo — Your markdown runs now</title>
+  <meta name="description" content="Stereo is an open-source VS Code extension that makes code blocks executable. Write .md files, see live dashboards inline. Zero lock-in.">
+  <meta name="keywords" content="VS Code extension, executable markdown, live dashboards, developer tools, open source">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Stereo — Your markdown runs now">
+  <meta property="og:description" content="A VS Code extension that makes code blocks executable. Write .md files, see live dashboards inline. Open source, zero lock-in.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://stereo.leap21llc.com">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Stereo — Your markdown runs now">
+  <meta name="twitter:description" content="A VS Code extension that makes code blocks executable. Write .md files, see live dashboards inline.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #111;
+      --card-bg: #1e1e1e;
+      --border: #333;
+      --text: #d4d4d4;
+      --text-heading: #fff;
+      --text-muted: #888;
+      --accent: oklch(0.72 0.15 250);
+      --accent-dim: oklch(0.22 0.02 250);
+      --accent-border: oklch(0.45 0.12 250);
+      --success: oklch(0.70 0.15 160);
+      --max-w: 1200px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    code, .mono {
+      font-family: "JetBrains Mono", "SF Mono", Monaco, monospace;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .container {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ---- NAV ---- */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(17, 17, 17, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+    }
+
+    .nav-logo {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-heading);
+      letter-spacing: -0.02em;
+    }
+
+    .nav-links { display: flex; gap: 24px; align-items: center; }
+
+    .nav-links a {
+      font-size: 14px;
+      color: var(--text-muted);
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text-heading); text-decoration: none; }
+
+    /* ---- HERO ---- */
+    .hero {
+      padding: 120px 0 80px;
+      text-align: center;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      border: 1px solid var(--accent-border);
+      background: var(--accent-dim);
+      padding: 6px 16px;
+      border-radius: 100px;
+      margin-bottom: 32px;
+    }
+
+    .hero h1 {
+      font-size: clamp(48px, 8vw, 80px);
+      font-weight: 300;
+      color: var(--text-heading);
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      margin-bottom: 16px;
+    }
+
+    .hero-tagline {
+      font-size: clamp(20px, 3vw, 28px);
+      font-weight: 400;
+      color: var(--text-heading);
+      margin-bottom: 16px;
+    }
+
+    .hero-sub {
+      font-size: 16px;
+      color: var(--text-muted);
+      max-width: 560px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent);
+      color: #111;
+      font-weight: 600;
+      font-size: 15px;
+      padding: 14px 28px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-primary:hover { opacity: 0.9; text-decoration: none; }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: var(--text);
+      font-weight: 500;
+      font-size: 15px;
+      padding: 14px 28px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--text-muted);
+      color: var(--text-heading);
+      text-decoration: none;
+    }
+
+    /* ---- DEMO ---- */
+    .demo {
+      padding: 40px 0 80px;
+    }
+
+    .demo-frame {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 0 80px rgba(56, 152, 236, 0.06);
+    }
+
+    .demo-titlebar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: #252526;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .demo-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #3c3c3c;
+    }
+
+    .demo-dot:nth-child(1) { background: #ff5f57; }
+    .demo-dot:nth-child(2) { background: #febc2e; }
+    .demo-dot:nth-child(3) { background: #28c840; }
+
+    .demo-titlebar span {
+      flex: 1;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .demo-body {
+      padding: 32px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      min-height: 320px;
+    }
+
+    .demo-editor, .demo-preview {
+      background: #1a1a1a;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    .demo-editor-label, .demo-preview-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .demo-code {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--text);
+    }
+
+    .demo-code .kw { color: #569cd6; }
+    .demo-code .str { color: #ce9178; }
+    .demo-code .fn { color: #dcdcaa; }
+    .demo-code .type { color: #4ec9b0; }
+    .demo-code .comment { color: #6a9955; }
+    .demo-code .tag { color: #569cd6; }
+    .demo-code .attr { color: #9cdcfe; }
+    .demo-code .num { color: #b5cea8; }
+
+    .demo-metric {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    .demo-metric-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .demo-metric-val {
+      font-size: 28px;
+      font-weight: 300;
+      color: var(--text-heading);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .demo-metric-val.up { color: oklch(0.70 0.15 160); }
+
+    .demo-sparkline {
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 32px;
+      margin-top: 8px;
+    }
+
+    .demo-sparkline-bar {
+      flex: 1;
+      background: var(--accent);
+      border-radius: 2px;
+      opacity: 0.7;
+    }
+
+    .demo-caption {
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 20px;
+    }
+
+    /* ---- HOW IT WORKS ---- */
+    .how {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .section-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .section-title {
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 300;
+      color: var(--text-heading);
+      text-align: center;
+      letter-spacing: -0.02em;
+      margin-bottom: 56px;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+    }
+
+    .step {
+      text-align: center;
+      padding: 32px 24px;
+    }
+
+    .step-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: var(--accent-dim);
+      border: 1px solid var(--accent-border);
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+
+    .step h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-heading);
+      margin-bottom: 8px;
+    }
+
+    .step p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .step code {
+      font-size: 13px;
+      background: var(--accent-dim);
+      border: 1px solid var(--accent-border);
+      padding: 2px 8px;
+      border-radius: 4px;
+      color: var(--accent);
+    }
+
+    /* ---- FEATURES ---- */
+    .features {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .feature-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      transition: border-color 0.2s;
+    }
+
+    .feature-card:hover {
+      border-color: var(--accent-border);
+    }
+
+    .feature-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--accent-dim);
+      border: 1px solid var(--accent-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      font-size: 18px;
+    }
+
+    .feature-card h3 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-heading);
+      margin-bottom: 8px;
+    }
+
+    .feature-card p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* ---- COMPARISON ---- */
+    .comparison {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .comparison-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+    }
+
+    .comparison-card .vs-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .comparison-card p {
+      font-size: 15px;
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* ---- CTA FOOTER ---- */
+    .cta-footer {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .cta-footer h2 {
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 300;
+      color: var(--text-heading);
+      letter-spacing: -0.02em;
+      margin-bottom: 32px;
+    }
+
+    .cta-footer .hero-actions { margin-bottom: 24px; }
+
+    /* ---- FOOTER ---- */
+    footer {
+      padding: 32px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+
+    footer p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    footer a { color: var(--text-muted); }
+    footer a:hover { color: var(--text); }
+
+    /* ---- RESPONSIVE ---- */
+    @media (max-width: 768px) {
+      .hero { padding: 80px 0 48px; }
+
+      .steps {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .step { padding: 24px 16px; }
+
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .comparison-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .demo-body {
+        grid-template-columns: 1fr;
+      }
+
+      .nav-links a:not(:last-child) { display: none; }
+    }
+
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .feature-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .comparison-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container">
+      <span class="nav-logo">Stereo</span>
+      <div class="nav-links">
+        <a href="#how">How it works</a>
+        <a href="#features">Features</a>
+        <a href="https://gitlab.leap21llc.com/leap21/stereo" target="_blank" rel="noopener">GitLab</a>
+        <a href="https://marketplace.visualstudio.com/items?itemName=leap21.stereo" class="btn-primary" style="padding: 8px 18px; font-size: 13px; border-radius: 8px;">Install</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge">Open Source VS Code Extension</div>
+      <h1>Stereo</h1>
+      <p class="hero-tagline">Your markdown runs now.</p>
+      <p class="hero-sub">A VS Code extension that makes code blocks executable. Write <code>.md</code> files, see live dashboards inline. Open source, zero lock-in.</p>
+      <div class="hero-actions">
+        <a href="https://marketplace.visualstudio.com/items?itemName=leap21.stereo" class="btn-primary" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+          Install from Marketplace
+        </a>
+        <a href="https://gitlab.leap21llc.com/leap21/stereo" class="btn-secondary" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 13.29V3h-7.77L12 5.12 9.77 3H2v10.29l10 8.34 10-8.34z"/></svg>
+          View Source on GitLab
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Demo -->
+  <section class="demo">
+    <div class="container">
+      <div class="demo-frame">
+        <div class="demo-titlebar">
+          <div class="demo-dot"></div>
+          <div class="demo-dot"></div>
+          <div class="demo-dot"></div>
+          <span>api-health.md — Stereo Preview</span>
+        </div>
+        <div class="demo-body">
+          <!-- Editor side -->
+          <div class="demo-editor">
+            <div class="demo-editor-label">Markdown Source</div>
+            <div class="demo-code">
+              <span class="comment"># API Health Dashboard</span><br><br>
+              <span class="kw">```tsx run</span> <span class="attr">refresh=30s</span><br>
+              <span class="kw">const</span> <span class="attr">res</span> = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">"/api/health"</span>);<br>
+              <span class="kw">const</span> <span class="attr">data</span> = <span class="kw">await</span> <span class="attr">res</span>.<span class="fn">json</span>();<br><br>
+              <span class="kw">return</span> (<br>
+              &nbsp;&nbsp;&lt;<span class="type">MetricCard</span><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<span class="attr">label</span>=<span class="str">"Uptime"</span><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<span class="attr">value</span>={<span class="attr">data</span>.<span class="attr">uptime</span>}<br>
+              &nbsp;&nbsp;/&gt;<br>
+              );<br>
+              <span class="kw">```</span>
+            </div>
+          </div>
+          <!-- Preview side -->
+          <div class="demo-preview">
+            <div class="demo-preview-label">Live Output</div>
+            <div class="demo-metric">
+              <div class="demo-metric-label">Uptime</div>
+              <div class="demo-metric-val up">99.97%</div>
+              <div class="demo-sparkline">
+                <div class="demo-sparkline-bar" style="height: 70%"></div>
+                <div class="demo-sparkline-bar" style="height: 85%"></div>
+                <div class="demo-sparkline-bar" style="height: 60%"></div>
+                <div class="demo-sparkline-bar" style="height: 90%"></div>
+                <div class="demo-sparkline-bar" style="height: 95%"></div>
+                <div class="demo-sparkline-bar" style="height: 80%"></div>
+                <div class="demo-sparkline-bar" style="height: 100%"></div>
+                <div class="demo-sparkline-bar" style="height: 88%"></div>
+                <div class="demo-sparkline-bar" style="height: 75%"></div>
+                <div class="demo-sparkline-bar" style="height: 92%"></div>
+              </div>
+            </div>
+            <div class="demo-metric">
+              <div class="demo-metric-label">Response Time</div>
+              <div class="demo-metric-val">142<span style="font-size: 16px; color: var(--text-muted);"> ms</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="demo-caption">Live dashboard output from a standard markdown file</p>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="how" id="how">
+    <div class="container">
+      <div class="section-label">How it works</div>
+      <h2 class="section-title">Three steps. No config.</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <h3>Write executable blocks</h3>
+          <p>Add <code>```tsx run</code> to any code block in a standard <code>.md</code> file. That's the only syntax change.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <h3>Open Stereo preview</h3>
+          <p>Press <code>Ctrl+Shift+M</code> to open the Stereo panel alongside your editor. Split view, side by side.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <h3>Click Run</h3>
+          <p>Hit the Run button on any block. Output renders inline: metrics, tables, charts. Auto-refresh optional.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="features" id="features">
+    <div class="container">
+      <div class="section-label">Features</div>
+      <h2 class="section-title">Everything you need, nothing you don't.</h2>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <h3>Zero Lock-in</h3>
+          <p>Files stay <code>.md</code>. No proprietary format, no cell metadata. Works with git, GitHub, GitLab, any renderer.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+          </div>
+          <h3>Live Dashboards</h3>
+          <p>Built-in components: MetricCard, Sparkline, StatusTable. Render live data from APIs directly in your markdown.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <h3>Secret Injection</h3>
+          <p>Rust sidecar replaces <code>{"{{env.X}}"}</code> from <code>.env</code> files. Credentials never touch the JavaScript runtime.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          </div>
+          <h3>Auto-Refresh</h3>
+          <p>Set <code>refresh=30s</code> on any block. Data stays current without manual re-runs. Polling, not polling you.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <h3>VS Code Native</h3>
+          <p>CustomTextEditorProvider. Your keybindings, your theme, your extensions. No Electron wrapper on top of Electron.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h3>Open Source</h3>
+          <p>MIT licensed. Inspect every line, fork it, self-host it. No telemetry, no analytics, no tracking.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Comparison -->
+  <section class="comparison" id="comparison">
+    <div class="container">
+      <div class="section-label">Why Stereo</div>
+      <h2 class="section-title">You already have the tools. We connect them.</h2>
+      <div class="comparison-grid">
+        <div class="comparison-card">
+          <div class="vs-label">vs Moment.dev</div>
+          <p>They built a new app. We built an extension. Same insight &mdash; markdown plus executable code is the best interface &mdash; without the new binary on your dock.</p>
+        </div>
+        <div class="comparison-card">
+          <div class="vs-label">vs Jupyter</div>
+          <p>No cell metadata, no <code>.ipynb</code> lock-in. Just <code>.md</code>. Your files render on GitHub, diff cleanly in PRs, and open in any text editor.</p>
+        </div>
+        <div class="comparison-card">
+          <div class="vs-label">vs Grafana</div>
+          <p>Your dashboard lives where your code lives. No new tab, no context switching. Runbooks and dashboards in the same file.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Footer -->
+  <section class="cta-footer">
+    <div class="container">
+      <h2>Ready to run your markdown?</h2>
+      <div class="hero-actions">
+        <a href="https://marketplace.visualstudio.com/items?itemName=leap21.stereo" class="btn-primary" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+          Install from Marketplace
+        </a>
+        <a href="https://gitlab.leap21llc.com/leap21/stereo" class="btn-secondary" target="_blank" rel="noopener">
+          View Source on GitLab
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>Stereo is open source under the MIT License. Built by <a href="https://leap21llc.com" target="_blank" rel="noopener">Leap21</a>.</p>
+    </div>
+  </footer>
+
+</body>
+</html>
