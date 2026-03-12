@@ -1,0 +1,103 @@
+stages:
+  - test
+  - build
+  - deploy
+
+variables:
+  BUN_VERSION: "1.2"
+
+# --- Extension ---
+
+extension:typecheck:
+  stage: test
+  image: oven/bun:${BUN_VERSION}
+  script:
+    - bun install --frozen-lockfile
+    - bun run typecheck
+  rules:
+    - changes:
+        - src/**/*
+        - package.json
+        - tsconfig.json
+
+extension:test:
+  stage: test
+  image: oven/bun:${BUN_VERSION}
+  script:
+    - bun install --frozen-lockfile
+    - bun run test
+  rules:
+    - changes:
+        - src/**/*
+        - package.json
+
+extension:build:
+  stage: build
+  image: oven/bun:${BUN_VERSION}
+  script:
+    - bun install --frozen-lockfile
+    - npx vsce package --no-dependencies
+  artifacts:
+    paths:
+      - "*.vsix"
+    expire_in: 7 days
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+
+# --- Billing Worker ---
+
+billing:typecheck:
+  stage: test
+  image: oven/bun:${BUN_VERSION}
+  script:
+    - cd billing
+    - bun install --frozen-lockfile
+    - bun run typecheck
+  rules:
+    - changes:
+        - billing/**/*
+
+billing:test:
+  stage: test
+  image: oven/bun:${BUN_VERSION}
+  script:
+    - cd billing
+    - bun install --frozen-lockfile
+    - bun run test
+  rules:
+    - changes:
+        - billing/**/*
+
+billing:deploy:
+  stage: deploy
+  image: node:22
+  script:
+    - npm install -g wrangler
+    - cd billing
+    - wrangler deploy
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      changes:
+        - billing/**/*
+  environment:
+    name: production
+    url: https://stereo-billing.leap21.workers.dev
+
+# --- Landing Page ---
+
+landing:deploy:
+  stage: deploy
+  image: node:22
+  script:
+    - npm install -g wrangler
+    - cp marketing/stereo-demo.mp4 landing/marketing/stereo-demo.mp4
+    - cp marketing/stereo-demo.webm landing/marketing/stereo-demo.webm
+    - wrangler pages deploy landing/ --project-name=stereo-landing --branch=main --commit-dirty=true
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      changes:
+        - landing/**/*
+        - marketing/stereo-demo.*
+  environment:
+    name: production
+    url: https://stereo.leap21llc.com

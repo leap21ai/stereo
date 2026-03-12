@@ -9,6 +9,8 @@ import {
   sendExecutionResult,
   sendExecutionError,
 } from "./messaging";
+import { SidecarClient } from "../sidecar";
+import { EnvWatcher } from "../env";
 
 // Stub components for SSR — the webview hydrates these with styled versions
 const MetricCard = (props: any) =>
@@ -57,6 +59,9 @@ const StatusTable = (props: any) =>
 
 export class StereoEditorProvider implements vscode.CustomTextEditorProvider {
   private readonly context: vscode.ExtensionContext;
+  private sidecar: SidecarClient | null = null;
+  private envWatcher: EnvWatcher | null = null;
+  private sidecarInitialized = false;
 
   constructor(context: vscode.ExtensionContext) {
     this.context = context;
@@ -77,6 +82,9 @@ export class StereoEditorProvider implements vscode.CustomTextEditorProvider {
     };
 
     webview.html = this.getWebviewContent(webview);
+
+    // Start sidecar (non-blocking, falls back to direct fetch if unavailable)
+    this.initSidecar(document);
 
     // Parse and send initial blocks
     const parsed = parseDocument(document.getText());
@@ -124,6 +132,8 @@ export class StereoEditorProvider implements vscode.CustomTextEditorProvider {
     webviewPanel.onDidDispose(() => {
       changeDisposable.dispose();
       messageDisposable.dispose();
+      this.envWatcher?.dispose();
+      this.sidecar?.stop();
     });
   }
 
@@ -161,7 +171,7 @@ export class StereoEditorProvider implements vscode.CustomTextEditorProvider {
 
     const sandbox: Record<string, unknown> = {
       console: capturedConsole,
-      fetch,
+      fetch: this.createProxiedFetch(),
       setTimeout,
       clearTimeout,
       React,
@@ -220,6 +230,92 @@ export class StereoEditorProvider implements vscode.CustomTextEditorProvider {
     }
 
     return parts.join("\n") || "<span class=\"stereo-empty\">No output</span>";
+  }
+
+  private async initSidecar(document: vscode.TextDocument): Promise<void> {
+    if (this.sidecarInitialized) return;
+    this.sidecarInitialized = true;
+
+    try {
+      const workspaceRoot = vscode.workspace.getWorkspaceFolder(document.uri)?.uri.fsPath;
+
+      // Start env watcher
+      this.envWatcher = new EnvWatcher({
+        onUpdate: async (vars) => {
+          if (this.sidecar?.isRunning) {
+            try {
+              await this.sidecar.send("initialize", {
+                envVars: Object.fromEntries(vars),
+              });
+            } catch {
+              // Sidecar may not be ready yet
+            }
+          }
+        },
+      });
+      if (workspaceRoot) {
+        this.envWatcher.start(workspaceRoot);
+      }
+
+      // Start sidecar process
+      this.sidecar = new SidecarClient(this.context);
+      await this.sidecar.start();
+
+      if (!this.sidecar.isRunning) {
+        console.log("Stereo: No sidecar binary found, using direct fetch");
+        this.sidecar = null;
+        return;
+      }
+
+      // Send initial env vars to sidecar
+      const vars = this.envWatcher.getVars();
+      if (vars.size > 0) {
+        await this.sidecar.send("initialize", {
+          envVars: Object.fromEntries(vars),
+        });
+      }
+
+      console.log("Stereo: Sidecar connected");
+    } catch (err) {
+      console.warn("Stereo: Sidecar failed to start, using direct fetch:", err);
+      this.sidecar = null;
+    }
+  }
+
+  private createProxiedFetch(): typeof fetch {
+    const sidecar = this.sidecar;
+
+    if (!sidecar || !sidecar.isRunning) {
+      return fetch;
+    }
+
+    return async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+      const url = typeof input === "string"
+        ? input
+        : input instanceof URL
+          ? input.toString()
+          : input.url;
+      const method = init?.method ?? "GET";
+      const headers: Record<string, string> = {};
+
+      if (init?.headers) {
+        const h = new Headers(init.headers);
+        h.forEach((v, k) => { headers[k] = v; });
+      }
+
+      try {
+        const result = await sidecar.proxyFetch(url, method, headers, init?.body ? String(init.body) : undefined);
+
+        return new Response(JSON.stringify(result.body), {
+          status: result.status,
+          headers: result.headers,
+        });
+      } catch (err) {
+        // Fall back to direct fetch if sidecar proxy fails
+        console.warn("Stereo: Sidecar proxy failed, falling back to direct fetch:", err);
+        return fetch(input, init);
+      }
+    };
   }
 
   private getWebviewContent(webview: vscode.Webview): string {

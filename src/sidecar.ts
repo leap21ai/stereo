@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import * as path from "path";
+import * as fs from "fs";
 import { ChildProcess, spawn } from "child_process";
 import type { SidecarRequest, SidecarResponse } from "./types";
 
@@ -16,13 +17,11 @@ export class SidecarClient {
   constructor(private context: vscode.ExtensionContext) {}
 
   async start(): Promise<void> {
-    const binaryName = this.getBinaryName();
-    const binaryPath = path.join(
-      this.context.extensionPath,
-      "sidecar",
-      process.platform,
-      binaryName
-    );
+    const binaryPath = this.findBinary();
+    if (!binaryPath) {
+      console.log("[stereo-sidecar] No binary found, sidecar disabled");
+      return;
+    }
 
     try {
       this.process = spawn(binaryPath, [], {
@@ -151,6 +150,27 @@ export class SidecarClient {
       console.warn("[stereo-sidecar] Health check failed, restarting...");
       this.process?.kill();
     }
+  }
+
+  private findBinary(): string | null {
+    const binaryName = this.getBinaryName();
+    const extensionRoot = this.context.extensionPath;
+
+    // Dev build (cargo build --release)
+    const devPath = path.join(extensionRoot, "sidecar", "target", "release", binaryName);
+    if (fs.existsSync(devPath)) return devPath;
+
+    // Bundled binary (platform-specific)
+    const bundledPath = path.join(extensionRoot, "sidecar", process.platform, binaryName);
+    if (fs.existsSync(bundledPath)) return bundledPath;
+
+    // Legacy path (platform dir with arch)
+    const archPath = path.join(
+      extensionRoot, "sidecar", `${process.platform}-${process.arch}`, binaryName
+    );
+    if (fs.existsSync(archPath)) return archPath;
+
+    return null;
   }
 
   private getBinaryName(): string {

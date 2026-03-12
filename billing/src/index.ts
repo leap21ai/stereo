@@ -4,6 +4,7 @@ import { logger } from "hono/logger";
 import { secureHeaders } from "hono/secure-headers";
 
 import { activate } from "./routes/activate";
+import { checkout } from "./routes/checkout";
 import { health } from "./routes/health";
 import { validate } from "./routes/validate";
 import { webhook } from "./routes/webhook";
@@ -36,11 +37,18 @@ app.use("/api/activate/*", async (c, next) => {
   return corsMiddleware(c, next);
 });
 
+app.use("/api/checkout/*", async (c, next) => {
+  const origins = c.env.ALLOWED_ORIGINS?.split(",").map((o) => o.trim()) ?? [];
+  const corsMiddleware = cors({ origin: origins, credentials: true });
+  return corsMiddleware(c, next);
+});
+
 // --- Routes ---
 
 app.route("/api/health", health);
 app.route("/api/validate", validate);
 app.route("/api/activate", activate);
+app.route("/api/checkout", checkout);
 app.route("/api/webhook/stripe", webhook);
 
 // --- Error Handling ---

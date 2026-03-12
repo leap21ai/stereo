@@ -7,10 +7,14 @@ node_modules/
 wireframe.html
 marketing/
 landing/
+billing/
 examples/
 .agents/
 *.map
+*.vsix
 esbuild.mjs
 vitest.config.ts
 tsconfig.json
 .wrangler/
+.gitlab-ci.yml
+.DS_Store

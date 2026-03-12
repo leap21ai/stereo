@@ -6,23 +6,35 @@ import { TIER_FEATURES } from "../types";
 
 import type { AppEnv, LicenseStatus, LicenseTier } from "../types";
 
+interface StripeSubscriptionObject {
+  id: string;
+  status: string;
+  customer: string;
+  items: {
+    data: Array<{
+      price: {
+        id: string;
+      };
+    }>;
+  };
+  current_period_end: number;
+}
+
+interface StripeCheckoutSessionObject {
+  id: string;
+  subscription: string;
+  customer: string;
+  metadata: {
+    license_key?: string;
+    tier?: string;
+  };
+}
+
 interface StripeEvent {
   id: string;
   type: string;
   data: {
-    object: {
-      id: string;
-      status: string;
-      customer: string;
-      items: {
-        data: Array<{
-          price: {
-            id: string;
-          };
-        }>;
-      };
-      current_period_end: number;
-    };
+    object: StripeSubscriptionObject | StripeCheckoutSessionObject;
   };
 }
 
@@ -48,9 +60,9 @@ webhook.post("/", async (c) => {
   }
 
   const event: StripeEvent = JSON.parse(rawBody);
-  const subscription = event.data.object;
 
   const handledEvents = [
+    "checkout.session.completed",
     "customer.subscription.created",
     "customer.subscription.updated",
     "customer.subscription.deleted",
@@ -60,6 +72,50 @@ webhook.post("/", async (c) => {
     // Acknowledge but ignore unhandled event types
     return c.json({ received: true, handled: false });
   }
+
+  // Handle checkout.session.completed — create license from checkout metadata
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object as StripeCheckoutSessionObject;
+    const licenseKey = session.metadata?.license_key;
+    const tierStr = session.metadata?.tier;
+
+    if (!licenseKey || !tierStr) {
+      console.error("checkout.session.completed missing metadata:", session.id);
+      return c.json({ received: true, handled: false });
+    }
+
+    const tier = (tierStr === "enterprise" ? "enterprise" : "pro") as LicenseTier;
+
+    // Fetch the subscription to get current_period_end
+    const subRes = await fetch(
+      `https://api.stripe.com/v1/subscriptions/${session.subscription}`,
+      {
+        headers: { Authorization: `Bearer ${c.env.STRIPE_SECRET_KEY}` },
+      },
+    );
+    const sub = (await subRes.json()) as StripeSubscriptionObject;
+    const expiresAt = sub.current_period_end
+      ? new Date(sub.current_period_end * 1000).toISOString()
+      : null;
+
+    await upsertLicense(c.env.DB, {
+      licenseKey,
+      stripeCustomerId: session.customer,
+      stripeSubscriptionId: session.subscription,
+      tier,
+      status: "active",
+      expiresAt,
+    });
+
+    console.log(
+      `Webhook processed: checkout.session.completed sub=${session.subscription} tier=${tier}`,
+    );
+
+    return c.json({ received: true, handled: true });
+  }
+
+  // Handle subscription lifecycle events
+  const subscription = event.data.object as StripeSubscriptionObject;
 
   const tier: LicenseTier = resolveSubscriptionTier(
     subscription,
