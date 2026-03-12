@@ -2,7 +2,7 @@
   "name": "stereo",
   "displayName": "Stereo",
   "description": "Executable markdown for VS Code",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "publisher": "leap21",
   "license": "MIT",
   "icon": "assets/icon.png",
