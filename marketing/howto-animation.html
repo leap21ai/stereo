@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    font-family: "Inter", sans-serif;
+    overflow: hidden;
+  }
+
+  .screen {
+    width: 960px;
+    height: 600px;
+    background: #1e1e1e;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #333;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Title bar */
+  .titlebar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: #252526;
+    border-bottom: 1px solid #333;
+  }
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dot.r { background: #ff5f57; }
+  .dot.y { background: #febc2e; }
+  .dot.g { background: #28c840; }
+  .titlebar-text {
+    flex: 1;
+    text-align: center;
+    font-size: 12px;
+    color: #888;
+  }
+
+  /* Main area */
+  .main {
+    flex: 1;
+    display: flex;
+    position: relative;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    width: 48px;
+    background: #252526;
+    border-right: 1px solid #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 12px;
+    gap: 16px;
+  }
+  .sidebar-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    background: #3c3c3c;
+    opacity: 0.5;
+  }
+  .sidebar-icon.active { opacity: 1; background: #444; }
+
+  /* Editor area */
+  .editor-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Tab bar */
+  .tabbar {
+    display: flex;
+    background: #252526;
+    border-bottom: 1px solid #333;
+    height: 36px;
+  }
+  .tab {
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    color: #888;
+    border-right: 1px solid #333;
+    background: #2d2d2d;
+  }
+  .tab.active {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    border-bottom: 1px solid #1e1e1e;
+    margin-bottom: -1px;
+  }
+  .tab-icon {
+    width: 14px;
+    height: 14px;
+    margin-right: 6px;
+    border-radius: 2px;
+    background: #569cd6;
+    opacity: 0.6;
+  }
+
+  /* Content split */
+  .content {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+  }
+
+  .editor-pane, .preview-pane {
+    flex: 1;
+    padding: 20px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .editor-pane {
+    border-right: 1px solid #333;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #d4d4d4;
+  }
+
+  .preview-pane {
+    background: #1a1a1a;
+  }
+
+  /* Code highlighting */
+  .ln { color: #555; margin-right: 16px; user-select: none; display: inline-block; width: 24px; text-align: right; }
+  .kw { color: #569cd6; }
+  .str { color: #ce9178; }
+  .tag { color: #569cd6; }
+  .attr { color: #9cdcfe; }
+  .val { color: #ce9178; }
+  .num { color: #b5cea8; }
+  .comment { color: #6a9955; }
+  .fn { color: #dcdcaa; }
+  .type { color: #4ec9b0; }
+  .punct { color: #808080; }
+
+  /* Typing animation for code lines */
+  .code-line {
+    white-space: pre;
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  /* Preview elements */
+  .preview-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #666;
+    margin-bottom: 16px;
+  }
+
+  .preview-content {
+    opacity: 0;
+  }
+
+  .metric-card {
+    background: #252526;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+
+  .metric-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #888;
+    margin-bottom: 4px;
+  }
+
+  .metric-value {
+    font-size: 28px;
+    font-weight: 300;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .metric-value.green { color: oklch(0.70 0.15 160); }
+
+  .metric-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .sparkline-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 40px;
+    margin-top: 8px;
+  }
+  .spark-bar {
+    flex: 1;
+    background: oklch(0.72 0.15 250);
+    border-radius: 2px;
+    opacity: 0;
+  }
+
+  /* Step indicator */
+  .step-overlay {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.85);
+    border: 1px solid #444;
+    border-radius: 10px;
+    padding: 12px 24px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    z-index: 10;
+    backdrop-filter: blur(8px);
+  }
+
+  .step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: oklch(0.72 0.15 250);
+    color: #111;
+    font-size: 12px;
+    font-weight: 700;
+    margin-right: 10px;
+  }
+
+  /* Run button */
+  .run-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: oklch(0.72 0.15 250);
+    color: #111;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 6px;
+    opacity: 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .run-btn::before {
+    content: "";
+    width: 0;
+    height: 0;
+    border-left: 7px solid #111;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+  }
+
+  /* Cursor blink */
+  .cursor {
+    display: inline-block;
+    width: 2px;
+    height: 16px;
+    background: #d4d4d4;
+    vertical-align: text-bottom;
+    animation: blink 1s steps(1) infinite;
+  }
+
+  @keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+  }
+
+  /* Live badge */
+  .live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: oklch(0.70 0.15 160);
+    background: oklch(0.20 0.04 160);
+    border: 1px solid oklch(0.35 0.08 160);
+    padding: 3px 8px;
+    border-radius: 4px;
+    opacity: 0;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+  }
+  .live-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: oklch(0.70 0.15 160);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* Status bar */
+  .statusbar {
+    height: 24px;
+    background: oklch(0.30 0.10 250);
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.7);
+    gap: 16px;
+  }
+  .statusbar-item { display: flex; align-items: center; gap: 4px; }
+
+  /* ---- ANIMATION KEYFRAMES ---- */
+
+  /* Phase 1: Step 1 label (0s-2s) */
+  .step-1 {
+    animation: fadeInOut 2.5s 0.3s both;
+  }
+
+  /* Phase 1: Code typing (0.5s-5s) */
+  .code-line:nth-child(1) { animation: typeIn 0.3s 0.8s both; }
+  .code-line:nth-child(2) { animation: typeIn 0.3s 1.0s both; }
+  .code-line:nth-child(3) { animation: typeIn 0.3s 1.3s both; }
+  .code-line:nth-child(4) { animation: typeIn 0.3s 1.8s both; }
+  .code-line:nth-child(5) { animation: typeIn 0.3s 2.1s both; }
+  .code-line:nth-child(6) { animation: typeIn 0.3s 2.4s both; }
+  .code-line:nth-child(7) { animation: typeIn 0.3s 2.7s both; }
+  .code-line:nth-child(8) { animation: typeIn 0.3s 3.0s both; }
+  .code-line:nth-child(9) { animation: typeIn 0.3s 3.3s both; }
+  .code-line:nth-child(10) { animation: typeIn 0.3s 3.6s both; }
+  .code-line:nth-child(11) { animation: typeIn 0.3s 3.9s both; }
+  .code-line:nth-child(12) { animation: typeIn 0.3s 4.2s both; }
+  .code-line:nth-child(13) { animation: typeIn 0.3s 4.5s both; }
+
+  /* Phase 2: Step 2 label + Run button (5s-7s) */
+  .step-2 { animation: fadeInOut 2.5s 5.2s both; }
+  .run-btn { animation: fadeIn 0.4s 5.5s both; }
+
+  /* Phase 3: Click flash on run button */
+  .run-btn-flash {
+    animation: clickFlash 0.3s 6.5s both;
+  }
+
+  /* Phase 3: Step 3 + preview appears (7s-12s) */
+  .step-3 { animation: fadeInOut 2.5s 7s both; }
+  .preview-content { animation: fadeIn 0.6s 7.2s both; }
+  .live-badge { animation: fadeIn 0.4s 7.5s both; }
+
+  /* Sparkline bars animate in */
+  .spark-bar:nth-child(1) { animation: growBar 0.3s 7.8s both; --h: 60%; }
+  .spark-bar:nth-child(2) { animation: growBar 0.3s 7.9s both; --h: 80%; }
+  .spark-bar:nth-child(3) { animation: growBar 0.3s 8.0s both; --h: 45%; }
+  .spark-bar:nth-child(4) { animation: growBar 0.3s 8.1s both; --h: 90%; }
+  .spark-bar:nth-child(5) { animation: growBar 0.3s 8.2s both; --h: 70%; }
+  .spark-bar:nth-child(6) { animation: growBar 0.3s 8.3s both; --h: 95%; }
+  .spark-bar:nth-child(7) { animation: growBar 0.3s 8.4s both; --h: 55%; }
+  .spark-bar:nth-child(8) { animation: growBar 0.3s 8.5s both; --h: 85%; }
+  .spark-bar:nth-child(9) { animation: growBar 0.3s 8.6s both; --h: 75%; }
+  .spark-bar:nth-child(10) { animation: growBar 0.3s 8.7s both; --h: 100%; }
+
+  /* Phase 4: auto-refresh indicator (10s-12s) */
+  .step-4 { animation: fadeInOut 3s 10s both; }
+
+  @keyframes typeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes fadeInOut {
+    0% { opacity: 0; transform: translateX(-50%) translateY(8px); }
+    15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-4px); }
+  }
+
+  @keyframes clickFlash {
+    0% { transform: scale(1); filter: brightness(1); }
+    50% { transform: scale(0.95); filter: brightness(1.3); }
+    100% { transform: scale(1); filter: brightness(1); }
+  }
+
+  @keyframes growBar {
+    from { height: 0; opacity: 0; }
+    to { height: var(--h); opacity: 0.8; }
+  }
+</style>
+</head>
+<body>
+  <div class="screen">
+    <div class="titlebar">
+      <div class="dot r"></div>
+      <div class="dot y"></div>
+      <div class="dot g"></div>
+      <span class="titlebar-text">dashboard.md — Stereo Preview</span>
+    </div>
+
+    <div class="main">
+      <div class="sidebar">
+        <div class="sidebar-icon active"></div>
+        <div class="sidebar-icon"></div>
+        <div class="sidebar-icon"></div>
+        <div class="sidebar-icon"></div>
+      </div>
+
+      <div class="editor-area">
+        <div class="tabbar">
+          <div class="tab active">
+            <div class="tab-icon"></div>
+            dashboard.md
+          </div>
+          <div class="tab">
+            <div class="tab-icon" style="background:#4ec9b0;"></div>
+            Stereo Preview
+          </div>
+        </div>
+
+        <div class="content">
+          <!-- Editor pane -->
+          <div class="editor-pane">
+            <div class="code-line"><span class="ln">1</span><span class="comment"># My Dashboard</span></div>
+            <div class="code-line"><span class="ln">2</span></div>
+            <div class="code-line"><span class="ln">3</span><span class="punct">```</span><span class="type">tsx run</span> <span class="attr">refresh=30s</span></div>
+            <div class="code-line"><span class="ln">4</span><span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span><span class="punct">(</span><span class="str">"/api/health"</span><span class="punct">);</span></div>
+            <div class="code-line"><span class="ln">5</span><span class="kw">const</span> data = <span class="kw">await</span> res.<span class="fn">json</span><span class="punct">();</span></div>
+            <div class="code-line"><span class="ln">6</span></div>
+            <div class="code-line"><span class="ln">7</span><span class="kw">return</span> <span class="punct">(</span></div>
+            <div class="code-line"><span class="ln">8</span>  <span class="punct">&lt;</span><span class="type">DashGrid</span> <span class="attr">cols</span><span class="punct">={</span><span class="num">2</span><span class="punct">}&gt;</span></div>
+            <div class="code-line"><span class="ln">9</span>    <span class="punct">&lt;</span><span class="type">MetricCard</span></div>
+            <div class="code-line"><span class="ln">10</span>      <span class="attr">label</span><span class="punct">=</span><span class="str">"Uptime"</span></div>
+            <div class="code-line"><span class="ln">11</span>      <span class="attr">value</span><span class="punct">={</span>data.uptime<span class="punct">} /&gt;</span></div>
+            <div class="code-line"><span class="ln">12</span>  <span class="punct">&lt;/</span><span class="type">DashGrid</span><span class="punct">&gt;</span></div>
+            <div class="code-line"><span class="ln">13</span><span class="punct">```</span></div>
+          </div>
+
+          <!-- Preview pane -->
+          <div class="preview-pane">
+            <div class="live-badge"><div class="live-dot"></div> LIVE</div>
+            <div class="run-btn run-btn-flash">RUN</div>
+
+            <div class="preview-content" style="margin-top: 48px;">
+              <div class="preview-label">Stereo Preview</div>
+              <div class="metric-grid">
+                <div class="metric-card">
+                  <div class="metric-label">Uptime</div>
+                  <div class="metric-value green">99.97%</div>
+                </div>
+                <div class="metric-card">
+                  <div class="metric-label">Latency</div>
+                  <div class="metric-value">42ms</div>
+                </div>
+                <div class="metric-card">
+                  <div class="metric-label">Status</div>
+                  <div class="metric-value green">Healthy</div>
+                </div>
+                <div class="metric-card">
+                  <div class="metric-label">Requests</div>
+                  <div class="metric-value">1.2M</div>
+                </div>
+              </div>
+              <div class="sparkline-row">
+                <div class="spark-bar"></div>
+                <div class="spark-bar"></div>
+                <div class="spark-bar"></div>
+                <div class="spark-bar"></div>
+                <div class="spark-bar"></div>
+                <div class="spark-bar"></div>
+                <div class="spark-bar"></div>
+                <div class="spark-bar"></div>
+                <div class="spark-bar"></div>
+                <div class="spark-bar"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="statusbar">
+      <span class="statusbar-item">Stereo</span>
+      <span class="statusbar-item">1 block</span>
+      <span class="statusbar-item" style="margin-left:auto;">UTF-8</span>
+      <span class="statusbar-item">Markdown</span>
+    </div>
+
+    <!-- Step overlays -->
+    <div class="step-overlay step-1"><span class="step-num">1</span> Write a tsx run block in any .md file</div>
+    <div class="step-overlay step-2"><span class="step-num">2</span> Click Run to execute</div>
+    <div class="step-overlay step-3"><span class="step-num">3</span> Live output renders inline</div>
+    <div class="step-overlay step-4"><span class="step-num">4</span> Auto-refreshes every 30 seconds</div>
+  </div>
+</body>
+</html>
