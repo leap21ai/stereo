@@ -175,14 +175,12 @@ export class StereoEditorProvider implements vscode.CustomTextEditorProvider {
 
     const ctx = vm.createContext(sandbox);
 
-    // Wrap code to capture the last expression value
+    // Wrap code in async IIFE to support top-level await
     const wrappedCode = `
       "use strict";
-      let __result__;
-      __result__ = (function() {
+      (async function() {
         ${block.code}
       })();
-      __result__;
     `;
 
     const script = new vm.Script(wrappedCode, {
