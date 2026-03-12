@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <rect width="128" height="128" rx="24" fill="#111111"/>
+  <g transform="translate(14, 24)" stroke="#4d8fcc" stroke-width="4" stroke-linecap="round" fill="none">
+    <!-- Left channel waveform -->
+    <line x1="10" y1="56" x2="10" y2="24"/>
+    <line x1="24" y1="68" x2="24" y2="12"/>
+    <line x1="38" y1="60" x2="38" y2="20"/>
+    <line x1="52" y1="72" x2="52" y2="8"/>
+    <line x1="66" y1="64" x2="66" y2="16"/>
+    <!-- Right channel waveform (mirrored) -->
+    <line x1="10" y1="56" x2="10" y2="80"/>
+    <line x1="24" y1="68" x2="24" y2="80"/>
+    <line x1="38" y1="60" x2="38" y2="80"/>
+    <line x1="52" y1="72" x2="52" y2="80"/>
+    <line x1="66" y1="64" x2="66" y2="80"/>
+    <!-- Second stereo pair -->
+    <line x1="80" y1="52" x2="80" y2="28"/>
+    <line x1="80" y1="52" x2="80" y2="80"/>
+    <line x1="90" y1="46" x2="90" y2="34"/>
+    <line x1="90" y1="46" x2="90" y2="80"/>
+  </g>
+</svg>

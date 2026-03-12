@@ -5,6 +5,30 @@
   "version": "0.1.0",
   "publisher": "leap21",
   "license": "MIT",
+  "icon": "assets/icon.png",
+  "galleryBanner": {
+    "color": "#111111",
+    "theme": "dark"
+  },
+  "categories": [
+    "Other",
+    "Visualization"
+  ],
+  "keywords": [
+    "markdown",
+    "executable",
+    "dashboard",
+    "runbook",
+    "live"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.leap21llc.com/leap21/stereo"
+  },
+  "homepage": "https://stereo.leap21llc.com",
+  "bugs": {
+    "url": "https://gitlab.leap21llc.com/leap21/stereo/-/issues"
+  },
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -56,6 +80,8 @@
   "devDependencies": {
     "@types/markdown-it": "^14.1.0",
     "@types/node": "^20.11.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
     "@types/vscode": "^1.85.0",
     "esbuild": "^0.24.0",
     "typescript": "^5.7.0",
@@ -63,8 +89,6 @@
     "vsce": "^2.15.0"
   },
   "dependencies": {
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
     "markdown-it": "^14.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
