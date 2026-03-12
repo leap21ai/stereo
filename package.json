@@ -23,11 +23,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://gitlab.leap21llc.com/leap21/stereo"
+    "url": "https://github.com/leap21ai/stereo"
   },
   "homepage": "https://stereo.leap21llc.com",
   "bugs": {
-    "url": "https://gitlab.leap21llc.com/leap21/stereo/-/issues"
+    "url": "https://github.com/leap21ai/stereo/issues"
   },
   "engines": {
     "vscode": "^1.85.0"

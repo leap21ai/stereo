@@ -80,11 +80,11 @@ The architecture keeps the extension host lightweight -- parsing and rendering h
 
 ## Contributing
 
-Contributions are welcome. The source is hosted on GitLab:
+Contributions are welcome. The source is hosted on GitHub:
 
-[gitlab.leap21llc.com/leap21/stereo](https://gitlab.leap21llc.com/leap21/stereo)
+[github.com/leap21ai/stereo](https://github.com/leap21ai/stereo)
 
-Open an issue or submit a merge request. Please follow the existing code style (2-space indent, semicolons, double quotes).
+Open an issue or submit a pull request. Please follow the existing code style (2-space indent, semicolons, double quotes).
 
 ---
 
